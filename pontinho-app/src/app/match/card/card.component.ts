@@ -1,5 +1,6 @@
 import { Component, OnInit, Input } from '@angular/core';
 import { trigger, state, transition, animate, style } from '@angular/animations';
+import { Card } from 'src/app/interfaces/Card';
 
 @Component({
   selector: '[appCard]',
@@ -20,7 +21,7 @@ import { trigger, state, transition, animate, style } from '@angular/animations'
 })
 export class CardComponent implements OnInit {
 
-  @Input() value: string;
+  @Input() data: Card;
 
   @Input() flip: string = 'up';
 

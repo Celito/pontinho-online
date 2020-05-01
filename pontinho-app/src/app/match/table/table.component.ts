@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
+import { Card } from 'src/app/interfaces/Card';
 
 @Component({
   selector: 'app-table',
@@ -8,8 +9,8 @@ import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/dr
 })
 export class TableComponent implements OnInit {
 
-  playerCards = ['AC', '2C', '3C', '4C'];
-  pile = ['KC', 'QC', 'JC', '10C', '9C', '8C', '7C', '6C', '5C'];
+  playerCards = [{ id: 1 }, { id: 2 }, { id: 3 }, { id: 4 }];
+  pile = [{ id: 13 }, { id: 12 }, { id: 11 }, { id: 10 }, { id: 9 }, { id: 8 }, { id: 7 }, { id: 6 }, { id: 5 }];
   discard = [];
 
   constructor() { }
@@ -18,7 +19,7 @@ export class TableComponent implements OnInit {
 
   }
 
-  dropToPlayerHand(event: CdkDragDrop<string[]>) {
+  dropToPlayerHand(event: CdkDragDrop<Card[]>) {
     if (event.previousContainer === event.container) {
       moveItemInArray(this.playerCards, event.previousIndex, event.currentIndex);
     } else {
@@ -30,7 +31,7 @@ export class TableComponent implements OnInit {
     }
   }
 
-  dropToDiscard(event: CdkDragDrop<string[]>) {
+  dropToDiscard(event: CdkDragDrop<Card[]>) {
     if (event.previousContainer !== event.container) {
       transferArrayItem(event.previousContainer.data, event.container.data,
         event.previousIndex, event.container.data.length)
