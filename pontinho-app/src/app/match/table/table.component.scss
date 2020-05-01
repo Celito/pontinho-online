@@ -1,0 +1,85 @@
+.cloth {
+  width: 100vw;
+  height: 96vh;
+  background-color: #2b4115;
+  background-image: url("../../../assets/images/background.png");
+  background-repeat:no-repeat;
+  background-position: center center;
+  background-size: cover;
+  padding-top: 4vh;
+
+  .top {
+    display: flex;
+    margin-right: auto;
+    margin-left: auto;
+    width: fit-content;
+  }
+
+  .pile {
+    display: flex;
+    flex-direction: column-reverse;
+    border: solid 6px #DDDDDD99;
+    border-radius: 20px;
+    padding: 1vw 1vw 16.28vw 1vw;
+    width: 10vw;
+    height: 1px;
+    margin-right: 1vw;
+    margin-left: 1vw;
+
+    ::ng-deep {
+      .card {
+        max-height: 1px;
+
+        .card-space {
+          height: 1px;
+        }
+      }
+    }
+  }
+  
+  .player-hand {
+    width: 32.5vw;
+    border: solid 6px #DDDDDD99;
+    display: flex;
+    justify-content: center;
+    border-radius: 20px;
+    padding: 1vw 8.5vw 1vw 1vw;
+    margin-right: auto;
+    margin-left: auto;
+    position: absolute;
+    bottom: 4vh;
+    left: calc(28.5vw - 6px);
+  }
+
+  .card {
+    display: inline-flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    box-sizing: border-box;
+    cursor: move;
+    font-size: 14px;
+    flex-grow: 1;
+    flex-basis: 0;
+  }
+}
+
+.cdk-drag-placeholder {
+  opacity: 0;
+}
+
+.cdk-drag-animating {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.card:last-child {
+  border: none;
+}
+
+.player-hand.cdk-drop-list-dragging .card:not(.cdk-drag-placeholder) {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
+
+.pile.cdk-drop-list-dragging .card:not(.cdk-drag-placeholder) {
+  transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+}
