@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 import { Card } from 'src/app/interfaces/Card';
+import { MatchService } from 'src/app/services/match.service';
+import { GameState } from 'src/app/interfaces/GameState';
 
 @Component({
   selector: 'app-table',
@@ -9,14 +11,19 @@ import { Card } from 'src/app/interfaces/Card';
 })
 export class TableComponent implements OnInit {
 
+  gameState: GameState;
   playerCards = [{ id: 1 }, { id: 2 }, { id: 3 }, { id: 4 }];
-  pile = [{ id: 13 }, { id: 12 }, { id: 11 }, { id: 10 }, { id: 9 }, { id: 8 }, { id: 7 }, { id: 6 }, { id: 5 }];
+  pile: Card[] = [];
   discard = [];
+  playerName = "Celito";
 
-  constructor() { }
+  constructor(private matchService: MatchService) { }
 
   ngOnInit() {
-
+    this.matchService.getGameState().subscribe(gameState => {
+      this.pile = gameState.mainPile.cards;
+      this.gameState = gameState;
+    });
   }
 
   dropToPlayerHand(event: CdkDragDrop<Card[]>) {
