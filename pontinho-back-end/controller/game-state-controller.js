@@ -6,6 +6,7 @@ module.exports.createGame = function(req, res){
     newGameState
     .save()
     .then(res.status(200).send(newGameState))
+    //TODO Map for changing mainPile for ['0','0',...] to send to the front-end
     .catch((err => {
         console.log(err);
     }));
