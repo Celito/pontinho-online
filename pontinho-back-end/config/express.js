@@ -1,6 +1,6 @@
 const express = require('express');
 const cors = require('cors');
-// const userRouter = require('../route/users.js');
+const gameStateRouter = require('../route/game-state-route.js');
 // const photoRouter = require('../route/photos.js');
 const bodyParser = require('body-parser');
 const path = require('path');
@@ -12,7 +12,7 @@ module.exports = function () {
   app.use(cors());
   app.use(bodyParser.urlencoded({ extended: false }));
   app.use(express.static('./public'));
-  // userRouter(app);
+  gameStateRouter(app);
   // photoRouter(app);
   app.get('*', (req, res) => {
     res.sendfile(path.join(__dirname, '../public/index.html'));
