@@ -1,22 +1,25 @@
 <div class="cloth">
   <div class="top">
-    <div class="pile" cdkDropList [cdkDropListConnectedTo]="['playerHand']" [cdkDropListData]="pile"
-      cdkDropListSortingDisabled id="mainPile">
-      <div appCard *ngFor="let listCard of pile; last as lastCard" class="card" flip="down"
-        [data]="listCard" cdkDrag [cdkDragDisabled]="false"></div>
+    <div #mainPile="cdkDropList" class="pile" cdkDropList [cdkDropListConnectedTo]="[playerHand]"
+      [cdkDropListData]="pile" cdkDropListSortingDisabled id="mainPile"
+      (cdkDropListDropped)="dropBackToMainPile($event)">
+      <div appCard *ngFor="let listCard of pile; last as lastCard" class="card"
+        [flip]="listCard.id ? 'up' : 'down'" [data]="listCard" cdkDrag [cdkDragDisabled]="!lastCard"
+        (cdkDragStarted)="drawFromMainPile($event, listCard)"></div>
     </div>
-    <div class="pile" cdkDropList cdkDropListSortingDisabled id="discardPile"
-      [cdkDropListConnectedTo]="['playerHand']" [cdkDropListData]="discard"
+    <div #discardPile="cdkDropList" class="pile discard" cdkDropList cdkDropListSortingDisabled
+      id="discardPile" [cdkDropListConnectedTo]="[playerHand]" [cdkDropListData]="discard"
       (cdkDropListDropped)="dropToDiscard($event)">
       <div appCard *ngFor="let listCard of discard; last as lastCard" class="card" [data]="listCard"
         cdkDrag [cdkDragDisabled]="!lastCard"></div>
     </div>
   </div>
-  <div class="player-hand" cdkDropList id="playerHand" cdkDropListOrientation="horizontal"
-    [cdkDropListData]="playerCards" [cdkDropListConnectedTo]="['discardPile']"
-    (cdkDropListDropped)="dropToPlayerHand($event)">
+  <div #playerHand="cdkDropList" class="player-hand" cdkDropList id="playerHand"
+    cdkDropListOrientation="horizontal" [cdkDropListData]="playerCards"
+    [cdkDropListConnectedTo]="[discardPile]" (cdkDropListDropped)="dropToPlayerHand($event)">
     <div>
-      <div appCard class="card" *ngFor="let card of playerCards" cdkDrag [data]="card"></div>
+      <div appCard class="card" *ngFor="let card of playerCards" cdkDrag [data]="card"
+        [flip]="card.id ? 'up' : 'down'"></div>
     </div>
   </div>
 </div>

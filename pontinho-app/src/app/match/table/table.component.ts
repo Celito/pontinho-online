@@ -1,8 +1,9 @@
-import { Component, OnInit } from '@angular/core';
-import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
+import { Component, OnInit, ViewChild } from '@angular/core';
+import { CdkDragDrop, moveItemInArray, transferArrayItem, CdkDragStart, CdkDropList } from '@angular/cdk/drag-drop';
 import { Card } from 'src/app/interfaces/Card';
 import { MatchService } from 'src/app/services/match.service';
 import { GameState } from 'src/app/interfaces/GameState';
+import { animate } from '@angular/animations';
 
 @Component({
   selector: 'app-table',
@@ -16,6 +17,10 @@ export class TableComponent implements OnInit {
   pile: Card[] = [];
   discard = [];
   playerName = "Celito";
+  draggedCardNumber: number = 0;
+  draggedCard: Card;
+
+  @ViewChild('playerHand') playeHand: CdkDropList;
 
   constructor(private matchService: MatchService) { }
 
@@ -26,6 +31,28 @@ export class TableComponent implements OnInit {
     });
   }
 
+  drawFromMainPile(event: CdkDragStart, drawnCard: Card) {
+    this.matchService.drawFromMainPile().subscribe(card => {
+      if (this.draggedCard) {
+        this.draggedCard.id = card.id;
+        this.draggedCard = undefined;
+      } else {
+        this.draggedCardNumber = card.id;
+      }
+    });
+  }
+
+  dropBackToMainPile(event: CdkDragDrop<Card[]>) {
+    event.previousIndex = (event.previousContainer.data.length - 1) - event.previousIndex;
+    transferArrayItem(event.previousContainer.data, this.playeHand.data, event.previousIndex,
+      this.playeHand.data.length);
+
+    setTimeout(() => {
+      this.playeHand.data[this.playeHand.data.length - 1].id = this.draggedCardNumber;
+      this.draggedCardNumber = 0;
+    }, 100);
+  }
+
   dropToPlayerHand(event: CdkDragDrop<Card[]>) {
     if (event.previousContainer === event.container) {
       moveItemInArray(this.playerCards, event.previousIndex, event.currentIndex);
@@ -34,7 +61,17 @@ export class TableComponent implements OnInit {
         event.previousIndex = (event.previousContainer.data.length - 1) - event.previousIndex;
       }
       transferArrayItem(event.previousContainer.data, event.container.data,
-        event.previousIndex, event.currentIndex)
+        event.previousIndex, event.currentIndex);
+      if (event.previousContainer.id === 'mainPile') {
+        if (this.draggedCardNumber) {
+          setTimeout(() => {
+            event.container.data[event.currentIndex].id = this.draggedCardNumber;
+            this.draggedCardNumber = 0;
+          }, 100);
+        } else {
+          this.draggedCard = event.container.data[event.currentIndex];
+        }
+      }
     }
   }
 

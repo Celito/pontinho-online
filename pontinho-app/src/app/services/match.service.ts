@@ -34,4 +34,8 @@ export class MatchService {
 
     return of(gameState);
   }
+
+  drawFromMainPile(): Observable<Card> {
+    return of({ id: 1 });
+  }
 }
