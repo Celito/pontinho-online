@@ -4,6 +4,7 @@ import { Card } from 'src/app/interfaces/Card';
 import { MatchService } from 'src/app/services/match.service';
 import { GameState } from 'src/app/interfaces/GameState';
 import { animate } from '@angular/animations';
+import { TweenLite } from 'gsap';
 
 @Component({
   selector: 'app-table',
@@ -21,6 +22,7 @@ export class TableComponent implements OnInit {
   draggedCard: Card;
 
   @ViewChild('playerHand') playeHand: CdkDropList;
+  @ViewChild('mainPile') mainPile: CdkDropList;
 
   constructor(private matchService: MatchService) { }
 
@@ -43,14 +45,30 @@ export class TableComponent implements OnInit {
   }
 
   dropBackToMainPile(event: CdkDragDrop<Card[]>) {
-    event.previousIndex = (event.previousContainer.data.length - 1) - event.previousIndex;
-    transferArrayItem(event.previousContainer.data, this.playeHand.data, event.previousIndex,
-      this.playeHand.data.length);
+
+    const pileElement = this.mainPile.element.nativeElement;
+    const topCardElement = pileElement.children[pileElement.childElementCount - 1];
+    const handElement = this.playeHand.element.nativeElement.children[0];
+    const lastHandCard = handElement.children[handElement.childElementCount - 1];
+    const topCardBounds = topCardElement.getBoundingClientRect();
+    const lastHandCardBounds = lastHandCard.getBoundingClientRect();
+    const deltaX = lastHandCardBounds.x - topCardBounds.x;
+    const deltaY = lastHandCardBounds.y - topCardBounds.y;
+
+    TweenLite.to(topCardElement, 1, { x: deltaX, y: deltaY });
 
     setTimeout(() => {
-      this.playeHand.data[this.playeHand.data.length - 1].id = this.draggedCardNumber;
-      this.draggedCardNumber = 0;
-    }, 100);
+      event.previousIndex = (event.previousContainer.data.length - 1) - event.previousIndex;
+
+      transferArrayItem(event.previousContainer.data, this.playeHand.data, event.previousIndex,
+        this.playeHand.data.length);
+
+      setTimeout(() => {
+        this.playeHand.data[this.playeHand.data.length - 1].id = this.draggedCardNumber;
+        this.draggedCardNumber = 0;
+      }, 100);
+
+    }, 1000);
   }
 
   dropToPlayerHand(event: CdkDragDrop<Card[]>) {
