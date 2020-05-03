@@ -8,11 +8,13 @@
   margin-left: auto;
   margin-right: auto;
 
-  .new-match-section {
-    display: flex;
+  .user-data-section, 
+  .existing-matches-section {
+    flex-direction: column;
   }
 
   section {
+    display: flex;
     margin-top: 10px;
     margin-bottom: 10px;
   }

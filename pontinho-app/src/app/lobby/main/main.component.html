@@ -1,18 +1,21 @@
 <section class="main-section">
   <form>
     <h1>Pontinho Online</h1>
-    <mat-form-field appearance="fill" color="accent">
-      <mat-label>Nome do jogador</mat-label>
-      <input matInput [formControl]="name" />
-    </mat-form-field>
+    <section class="user-data-section">
+      <mat-form-field appearance="fill" color="accent">
+        <mat-label>Nome do jogador</mat-label>
+        <input matInput [formControl]="name" />
+        <mat-error *ngIf="name.invalid">{{getErrorMessage()}}</mat-error>
+      </mat-form-field>
+    </section>
     <mat-divider></mat-divider>
     <section class="new-match-section">
       <h2>Abrir mesa:</h2>
       <button mat-raised-button color="accent" (click)="createMatch()">Criar Partida</button>
     </section>
     <mat-divider *ngIf="matches && matches.length > 0"></mat-divider>
-    <section *ngIf="matches && matches.length > 0">
-      <h2>Mesas disponiveis:</h2>
+    <section class="existing-matches-section" *ngIf="matches && matches.length > 0">
+      <h2>Mesas disponíveis:</h2>
       <mat-list role="list">
         <mat-list-item *ngFor="let match of matches" role="listItem">
           <label>Mesa do {{match.host}}</label>

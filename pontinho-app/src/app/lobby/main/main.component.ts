@@ -11,7 +11,8 @@ import { FormControl, Validators } from '@angular/forms';
 })
 export class MainComponent implements OnInit {
 
-  name = new FormControl('', [Validators.required, Validators.minLength(3)]);
+  name = new FormControl('', [Validators.required, Validators.minLength(3),
+  Validators.maxLength(15), Validators.pattern('^[A-Za-z0-9çÇâãáñÑêéíôóúÁÉÍÓÚ]+$')]);
   matches: { _id: string, host: string }[];
 
   constructor(
@@ -32,6 +33,8 @@ export class MainComponent implements OnInit {
         this.matchService.gameState = gameState;
 
         this.router.navigate(['match']);
+      }, error => {
+        console.log(error);
       });
     }
   }
@@ -43,7 +46,27 @@ export class MainComponent implements OnInit {
         this.matchService.gameState = gameState;
 
         this.router.navigate(['match']);
+      }, error => {
+        console.log(error);
+        if (error.status === 409) {
+          this.name.setErrors({ conflict: true });
+        }
       });
     }
+  }
+
+  getErrorMessage(): string {
+    if (this.name.hasError('required')) {
+      return "Escolha um nome válido";
+    } else if (this.name.hasError('minlength')) {
+      return `Nome deve ter no mínimo ${this.name.errors['minlength'].requiredLength} letras`;
+    } else if (this.name.hasError('maxlength')) {
+      return `Nome não pode ter mais de ${this.name.errors['maxlength'].requiredLength} letras`;
+    } else if (this.name.hasError('pattern')) {
+      return "Nome pode apenas conter letras e números, sem espaços";
+    } else if (this.name.hasError('conflict')) {
+      return "Esse nome já esta em uso";
+    }
+    return "Nome inválido";
   }
 }
