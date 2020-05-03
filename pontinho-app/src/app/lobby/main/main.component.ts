@@ -12,6 +12,7 @@ import { FormControl, Validators } from '@angular/forms';
 export class MainComponent implements OnInit {
 
   name = new FormControl('', [Validators.required, Validators.minLength(3)]);
+  matches: { _id: string, host: string }[];
 
   constructor(
     private lobbyService: LobbyService,
@@ -19,7 +20,11 @@ export class MainComponent implements OnInit {
     private router: Router
   ) { }
 
-  ngOnInit(): void { }
+  ngOnInit(): void {
+    this.lobbyService.getMatches().subscribe(matches => {
+      this.matches = matches;
+    });
+  }
 
   createMatch() {
     if (this.name.valid) {
