@@ -21,7 +21,7 @@ module.exports.createGame = function(req, res){
                     GameState.findByIdAndUpdate(ngs._id, {$set:{players:ngsPlayers}},{new:true})
                     .then(updatedNgs => {
                         res.status(200)
-                        .send({_id:updatedNgs._id, players: updatedNgs.players, mainPile: Array.from(Array(104),(x, index) => 0), discard: updatedNgs.discard})
+                        .send({_id:updatedNgs._id, players: updatedNgs.players, mainPile: {cards: Array.from(Array(104),(x, index) => 0)}, discard: updatedNgs.discard})
                     })
                 })
             })
