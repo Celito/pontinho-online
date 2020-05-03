@@ -37,6 +37,7 @@ npm-debug.log
 yarn-error.log
 testem.log
 /typings
+packge-lock.json
 
 # System Files
 .DS_Store
