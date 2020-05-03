@@ -14,6 +14,10 @@ export class LobbyService {
     return this.http.post<GameState>('/api/match/create', { playerName });
   }
 
+  joinMatch(match_id: string, playerName: string): Observable<GameState> {
+    return this.http.post<GameState>('/api/match/join', { match_id, playerName });
+  }
+
   getMatches(): Observable<{ _id: string, host: string }[]> {
     return this.http.get<{ _id: string, host: string }[]>('/api/match');
   }

@@ -1,25 +1,24 @@
 <section class="main-section">
-  <h1>Pontinho Online</h1>
-  <mat-divider></mat-divider>
-  <section>
-    <h2>Abrir mesa:</h2>
-    <form>
-      <mat-form-field appearance="fill" color="accent">
-        <mat-label>Nome do jogador</mat-label>
-        <input matInput [formControl]="name" />
-      </mat-form-field>
-
+  <form>
+    <h1>Pontinho Online</h1>
+    <mat-form-field appearance="fill" color="accent">
+      <mat-label>Nome do jogador</mat-label>
+      <input matInput [formControl]="name" />
+    </mat-form-field>
+    <mat-divider></mat-divider>
+    <section class="new-match-section">
+      <h2>Abrir mesa:</h2>
       <button mat-raised-button color="accent" (click)="createMatch()">Criar Partida</button>
-    </form>
-  </section>
-  <mat-divider *ngIf="matches && matches.length > 0"></mat-divider>
-  <section *ngIf="matches && matches.length > 0">
-    <h2>Mesas disponiveis:</h2>
-    <mat-list role="list">
-      <mat-list-item *ngFor="let match of matches" role="listItem">
-        <label>Mesa do {{match.host}}</label>
-        <button mat-raised-button color="accent">Entrar</button>
-      </mat-list-item>
-    </mat-list>
-  </section>
+    </section>
+    <mat-divider *ngIf="matches && matches.length > 0"></mat-divider>
+    <section *ngIf="matches && matches.length > 0">
+      <h2>Mesas disponiveis:</h2>
+      <mat-list role="list">
+        <mat-list-item *ngFor="let match of matches" role="listItem">
+          <label>Mesa do {{match.host}}</label>
+          <button mat-raised-button color="accent" (click)="joinMatch(match._id)">Entrar</button>
+        </mat-list-item>
+      </mat-list>
+    </section>
+  </form>
 </section>

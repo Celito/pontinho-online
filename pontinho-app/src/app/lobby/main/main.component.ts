@@ -35,4 +35,15 @@ export class MainComponent implements OnInit {
       });
     }
   }
+
+  joinMatch(match_id: string) {
+    if (this.name.valid) {
+      console.log(`Entrando na partida de id ${match_id} com o nome ${this.name.value}`);
+      this.lobbyService.joinMatch(match_id, this.name.value).subscribe(gameState => {
+        this.matchService.gameState = gameState;
+
+        this.router.navigate(['match']);
+      });
+    }
+  }
 }
