@@ -5,7 +5,7 @@ module.exports.createGame = function(req, res){
     Player.findOne({playerName: req.body.playerName})
     .then(player => {
         if(player){
-            res.status(500).send("You are already in a match, not possible to be in two matches at the same time");
+            res.status(409).send("You are already in a match, not possible to be in two matches at the same time");
         }
         else{
             const newPlayer = new Player(req.body);
@@ -41,9 +41,18 @@ module.exports.createGame = function(req, res){
 module.exports.listMatches = function(req, res){
     GameState.find()
     .then(gs => {
-        var resJson = gs.map(function(gs) {
-            return{_id:gs._id, host: gs.host}
-        })
-        res.send(resJson);
+        if(gs){
+            var resJson = gs.map(function(gs) {
+                return{_id:gs._id, host: gs.host}
+            })
+            res.send(resJson);
+        }
+        else{
+            res.send([]);
+        }
     })
+}
+
+module.exports.joinMatch = function(req, res){
+
 }
