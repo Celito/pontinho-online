@@ -37,3 +37,13 @@ module.exports.createGame = function(req, res){
         }
     })  
 }
+
+module.exports.listMatches = function(req, res){
+    GameState.find()
+    .then(gs => {
+        var resJson = gs.map(function(gs) {
+            return{_id:gs._id, host: gs.host}
+        })
+        res.send(resJson);
+    })
+}
