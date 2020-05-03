@@ -17,9 +17,9 @@ function shuffleArray(array){
 shuffleArray(cards);
 const GameStateSchema = new Schema(
     {
-        players: {type: [String], required:true},
-        mainPile: {type: [Number], required: true, default: cards},
-        discard: {type: [Number], required: true, default: []}
+        players: {type: [mongoose.Types.ObjectId], required:true, default: []},
+        mainPile: {type: {}, required: true, default: {cards: cards}},
+        discard: {type: {}, required: true, default: {cards: []}}
     }
 );
 
