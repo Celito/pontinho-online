@@ -6,7 +6,7 @@ const Schema = mongoose.Schema;
 const PlayerSchema = new Schema(
     {
         playerName: {type: String, required: true},
-        cards: {type: {}, required: true, default:{cards: []}},
+        cards: {type: [], required: true, default:[]},
         yourTurn: {type: Boolean, required: true, default:false},
         alreadyDraw: {type: Boolean, required: true, default:false},
         scores: {type: Number, required:true, default: 0}

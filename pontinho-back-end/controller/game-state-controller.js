@@ -54,5 +54,48 @@ module.exports.listMatches = function(req, res){
 }
 
 module.exports.joinMatch = function(req, res){
-
+    Player.findOne({playerName: req.body.playerName})
+    .then(player => {
+        if(player){
+            res.status(409).send("You are already in a match, not possible to be in two matches at the same time");
+        }
+        else{
+            const newPlayer = new Player(req.body);
+            newPlayer
+            .save()
+            .then(np => {
+                GameState.findById({_id: req.body.match_id})
+                .then(gs => {
+                    const gsPlayers = gs.players;
+                    gsPlayers.push(np._id);
+                    GameState.findByIdAndUpdate(gs._id, {$set:{players:gsPlayers}}, {new:true})
+                    .then(updatedNgs => {
+                        Promise.all(
+                            gsPlayers.map(async function(gs) {
+                            return Player.findById({_id: gs._id})
+                            .then(p => {
+                                return p;
+                            })
+                        }))
+                        .then(playersJson => {
+                            console.log(playersJson);
+                            const resJson = {
+                                _id:updatedNgs._id, 
+                                host: updatedNgs.host, 
+                                mainPile: {cards: Array.from(Array(104), (x, index) => 0)}, 
+                                discard: updatedNgs.discard, 
+                                players: playersJson
+                            }
+                            
+                            res.status(200).send(resJson)
+                        });
+                        
+                    });
+                });
+            })
+            .catch((err => {
+                console.log(err);
+            }));
+        }
+    })
 }
