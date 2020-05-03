@@ -5,8 +5,14 @@ section {
   border-radius: 20px;
   width: 400px;
   padding: 1vw;
+  margin-left: auto;
+  margin-right: auto;
 
-  button {
-    margin-left: auto;
+  form {
+    display: flex;
+    flex-direction: column;
+    button {
+      margin-left: auto;
+    }
   }
 }
