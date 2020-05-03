@@ -18,10 +18,16 @@ module.exports.createGame = function(req, res){
                 .then(ngs => {
                     const ngsPlayers = ngs.players;
                     ngsPlayers.push(np._id);
-                    GameState.findByIdAndUpdate(ngs._id, {$set:{players:ngsPlayers}},{new:true})
+                    GameState.findByIdAndUpdate(ngs._id, {$set:{players:ngsPlayers, host:np.playerName}}, {new:true})
                     .then(updatedNgs => {
                         res.status(200)
-                        .send({_id:updatedNgs._id, players: updatedNgs.players, mainPile: {cards: Array.from(Array(104),(x, index) => 0)}, discard: updatedNgs.discard})
+                        .send({
+                               _id:updatedNgs._id, 
+                               host: updatedNgs.host, 
+                               mainPile: {cards: Array.from(Array(104), (x, index) => 0)}, 
+                               discard: updatedNgs.discard, 
+                               players: [np]
+                            })
                     })
                 })
             })
