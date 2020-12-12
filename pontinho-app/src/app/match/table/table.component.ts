@@ -27,10 +27,7 @@ export class TableComponent implements OnInit {
   constructor(private matchService: MatchService) { }
 
   ngOnInit() {
-    this.matchService.getGameState().subscribe(gameState => {
-      this.pile = gameState.mainPile.cards;
-      this.gameState = gameState;
-    });
+    this.matchService.getGameState().subscribe(this.updateGameState);
   }
 
   drawFromMainPile(event: CdkDragStart, drawnCard: Card) {
@@ -98,6 +95,11 @@ export class TableComponent implements OnInit {
       transferArrayItem(event.previousContainer.data, event.container.data,
         event.previousIndex, event.container.data.length)
     }
+  }
+
+  updateGameState(gameState: GameState) {
+    this.pile = gameState.mainPile.cards;
+    this.gameState = gameState;
   }
 
 }
