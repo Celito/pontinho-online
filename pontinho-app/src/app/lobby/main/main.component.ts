@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { LobbyService } from 'src/app/services/lobby.service';
+import { LobbyService } from 'src/app/services/lobby/lobby.service';
 import { Router } from '@angular/router';
-import { MatchService } from 'src/app/services/match.service';
+import { MatchService } from 'src/app/services/match/match.service';
 import { FormControl, Validators } from '@angular/forms';
 
 @Component({
@@ -22,16 +22,21 @@ export class MainComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.lobbyService.getMatches().subscribe(matches => {
-      this.matches = matches;
-    });
+    this.matchService.getGameState().subscribe(gameState => {
+      if (gameState) {
+        this.router.navigate(['match']);
+      } else {
+        this.lobbyService.getMatches().subscribe(matches => {
+          this.matches = matches;
+        });
+      }
+    })
   }
 
   createMatch() {
     if (this.name.valid) {
       this.lobbyService.createMatch(this.name.value).subscribe(gameState => {
-        this.matchService.gameState = gameState;
-
+        this.matchService.setGameState(gameState, this.name.value);
         this.router.navigate(['match']);
       }, error => {
         console.log(error);
@@ -43,8 +48,7 @@ export class MainComponent implements OnInit {
     if (this.name.valid) {
       console.log(`Entrando na partida de id ${match_id} com o nome ${this.name.value}`);
       this.lobbyService.joinMatch(match_id, this.name.value).subscribe(gameState => {
-        this.matchService.gameState = gameState;
-
+        this.matchService.setGameState(gameState, this.name.value);
         this.router.navigate(['match']);
       }, error => {
         console.log(error);

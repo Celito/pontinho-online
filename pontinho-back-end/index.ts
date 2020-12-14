@@ -1,26 +1,38 @@
 
 import * as http from 'http';
 import * as WebSocket from 'ws';
-import { MongoConnect } from './util/mongo-connect';
-import { ExpressConfig } from './config/express-config';
+import { PontinhoApp } from './config/pontinho-app';
+import { GameStateController } from './controller/game-state-controller';
+import * as mongoose from 'mongoose';
 
 
 // let app = require('./config/express-config')();
 
-const expressConfig = new ExpressConfig();
-
-const server = http.createServer(expressConfig.app);
-
-new MongoConnect(() => {
-  server.listen(expressConfig.app.get('port'), () => {
-    console.log('Pontinho back-end started to listen to port: ' + expressConfig.app.get('port'));
-  })
+const pontinhoApp = new PontinhoApp({
+  port: 3000,
+  controllers: [
+    new GameStateController()
+  ]
 });
+
+const server = http.createServer(pontinhoApp.app);
+
+mongoose.connect(
+  'mongodb://localhost:27017',
+  { useNewUrlParser: true, useUnifiedTopology: true },
+  () => {
+    console.log("Mongo connected");
+    server.listen(pontinhoApp.port, () => {
+      console.log('Pontinho back-end started to listen to port: ' + pontinhoApp.port);
+    })
+  }
+);
+mongoose.set('useFindAndModify', false);
 
 const wss = new WebSocket.Server({ server });
 
 wss.on('connection', (ws: WebSocket) => {
-  console.log('connected: %s', ws);
+  console.log(`New socket connection. Now server has ${wss.clients.size} connections.`);
 
   ws.on('message', (message: WebSocket.Data) => {
     console.log('received: %s', message);

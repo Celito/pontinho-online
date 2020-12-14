@@ -1,8 +1,8 @@
 import * as mongoose from 'mongoose';
-mongoose.connect('mongodb://localhost:27017', { useNewUrlParser: true });
-mongoose.set('useFindAndModify', false);
+import { Schema } from 'mongoose';
 
 export interface IPlayer extends mongoose.Document {
+  _id: Schema.Types.ObjectId;
   playerName: string;
   cards: number[];
   yourTurn: boolean;
@@ -10,7 +10,7 @@ export interface IPlayer extends mongoose.Document {
   scores: number;
 }
 
-const PlayerSchema = new mongoose.Schema(
+const PlayerSchema = new Schema(
   {
     playerName: { type: String, required: true },
     cards: { type: [Number], required: true, default: [] },

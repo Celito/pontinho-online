@@ -1,10 +1,11 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { CdkDragDrop, moveItemInArray, transferArrayItem, CdkDragStart, CdkDropList } from '@angular/cdk/drag-drop';
 import { Card } from 'src/app/interfaces/Card';
-import { MatchService } from 'src/app/services/match.service';
+import { MatchService } from 'src/app/services/match/match.service';
 import { GameState } from 'src/app/interfaces/GameState';
 import { animate } from '@angular/animations';
 import { TweenLite } from 'gsap';
+import { UserService } from 'src/app/services/user/user.service';
 
 @Component({
   selector: 'app-table',
@@ -14,7 +15,7 @@ import { TweenLite } from 'gsap';
 export class TableComponent implements OnInit {
 
   gameState: GameState;
-  playerCards = [{ id: 1 }, { id: 2 }, { id: 3 }, { id: 4 }];
+  playerCards = [];
   pile: Card[] = [];
   discard = [];
   playerName = "Celito";
@@ -24,10 +25,12 @@ export class TableComponent implements OnInit {
   @ViewChild('playerHand') playeHand: CdkDropList;
   @ViewChild('mainPile') mainPile: CdkDropList;
 
-  constructor(private matchService: MatchService) { }
+  constructor(
+    private matchService: MatchService
+  ) { }
 
   ngOnInit() {
-    this.matchService.getGameState().subscribe(this.updateGameState);
+    this.matchService.getGameState().subscribe(gs => this.updateGameState(gs));
   }
 
   drawFromMainPile(event: CdkDragStart, drawnCard: Card) {
@@ -100,6 +103,12 @@ export class TableComponent implements OnInit {
   updateGameState(gameState: GameState) {
     this.pile = gameState.mainPile.cards;
     this.gameState = gameState;
+
+    for (const player of gameState.players) {
+      if (player.name === this.matchService.userName) {
+        this.playerCards = player.cards;
+      }
+    }
   }
 
 }

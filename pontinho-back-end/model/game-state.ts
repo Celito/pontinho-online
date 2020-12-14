@@ -1,11 +1,10 @@
 import * as mongoose from 'mongoose';
+import { Schema } from 'mongoose';
 import { IPlayer } from './player';
-mongoose.connect('mongodb://localhost:27017', { useNewUrlParser: true });
-mongoose.set('useFindAndModify', false);
 
 export interface IGameState extends mongoose.Document {
     host: string;
-    players: IPlayer['_id'][];
+    players: (IPlayer['_id'] | IPlayer)[];
     mainPile: {
         cards: number[];
     }
@@ -26,10 +25,10 @@ function shuffleArray(array: number[]) {
 }
 
 shuffleArray(cards);
-const GameStateSchema = new mongoose.Schema(
+const GameStateSchema = new Schema(
     {
-        host: { type: String, required: true, default: " " },
-        players: { type: [mongoose.Types.ObjectId], required: true, default: [] },
+        host: String,
+        players: [{ type: Schema.Types.ObjectId, ref: 'Player', required: true }],
         mainPile: { type: {}, required: true, default: { cards } },
         discard: { type: {}, required: true, default: { cards: [] } }
     }
