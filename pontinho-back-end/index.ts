@@ -7,12 +7,10 @@ import * as mongoose from 'mongoose';
 
 
 // let app = require('./config/express-config')();
-
+const gameStateController = new GameStateController();
 const pontinhoApp = new PontinhoApp({
   port: 3000,
-  controllers: [
-    new GameStateController()
-  ]
+  controllers: [gameStateController]
 });
 
 const server = http.createServer(pontinhoApp.app);
@@ -36,6 +34,10 @@ wss.on('connection', (ws: WebSocket) => {
 
   ws.on('message', (message: WebSocket.Data) => {
     console.log('received: %s', message);
+    const decodedMessage = JSON.parse(message.toString());
+    if (decodedMessage.type === 'join') {
+      gameStateController.addSocketToMatch(ws, decodedMessage.data.matchId, decodedMessage.data.playerId)
+    }
   });
 
 });

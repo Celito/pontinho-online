@@ -1,12 +1,16 @@
 import PlayerModel, { IPlayer } from '../model/player';
 import GameStateModel, { IGameState } from '../model/game-state';
 import IControllerBase from '../config/controller-base';
+import * as WebSocket from 'ws';
 import { Request, Response, Application, Router } from "express";
-import { Schema } from 'mongoose';
 
 export class GameStateController implements IControllerBase {
 
   public router = Router();
+
+  public wsMatchGroups: {
+    [matchId: string]: { [playerId: string]: WebSocket }
+  } = {};
 
   initRoutes(app: Application): void {
     app.post("/api/match/create", (req, res) => this.createGame(req, res));
@@ -15,8 +19,8 @@ export class GameStateController implements IControllerBase {
     app.post("/api/match/join", (req, res) => this.joinMatch(req, res));
   }
 
-  createGame(req: any, res: any) {
-    PlayerModel.findOne({ playerName: req.body.playerName })
+  createGame(req: Request, res: Response) {
+    PlayerModel.findOne({ name: req.body.name })
       .then((player: IPlayer | null) => {
         if (player) {
           res.status(409).send("You are already in a match, not possible to be in two matches at the same time");
@@ -35,9 +39,10 @@ export class GameStateController implements IControllerBase {
                   GameStateModel
                     .findByIdAndUpdate(
                       ngs._id,
-                      { $set: { players: ngsPlayers, host: np.playerName } },
+                      { $set: { players: ngsPlayers, host: np.name } },
                       { new: true }
                     )
+                    .populate('players')
                     .then(updatedGameState => {
                       if (updatedGameState) {
                         res.status(200)
@@ -55,7 +60,7 @@ export class GameStateController implements IControllerBase {
       });
   }
 
-  listMatches(_: any, res: any) {
+  listMatches(_: Request, res: Response) {
     GameStateModel.find()
       .then(gameState => {
         if (gameState) {
@@ -71,7 +76,7 @@ export class GameStateController implements IControllerBase {
   }
 
   joinMatch(req: Request, res: Response) {
-    PlayerModel.findOne({ playerName: req.body.playerName })
+    PlayerModel.findOne({ name: req.body.name })
       .then(player => {
         if (player) {
           res.status(409).send("You are already in a match, not possible to be in two matches at the same time");
@@ -125,18 +130,29 @@ export class GameStateController implements IControllerBase {
       });
   }
 
-  filterGameStateForPlayer(gameState: IGameState, playerId: string): any {
+  public addSocketToMatch(socket: WebSocket, matchId: string, playerId: string) {
+    if (this.wsMatchGroups[matchId]) {
+      this.wsMatchGroups[matchId][playerId] = socket;
+    } else {
+      this.wsMatchGroups[matchId] = { playerId: socket };
+    }
+    console.log(`Adding a new WS to the match ${matchId}. The group now has ` +
+      `${Object.keys(this.wsMatchGroups[matchId]).length} connections`);
+  }
+
+  private filterGameStateForPlayer(gameState: IGameState, playerId: string): any {
     const filteredGameState = {
       _id: gameState._id,
       host: gameState.host,
       players: gameState.players.map(p => {
         const castP = p as IPlayer;
         return {
-          playerName: castP.playerName,
+          _id: castP._id,
+          name: castP.name,
           yourTurn: castP.yourTurn,
           alreadyDraw: castP.alreadyDraw,
           scores: castP.alreadyDraw,
-          cards: castP.cards.map(c => castP._id.toString() === playerId ? c : 0)
+          cards: castP.cards?.map(c => castP._id.toString() === playerId ? c : 0) || []
         };
       }),
       mainPile: {

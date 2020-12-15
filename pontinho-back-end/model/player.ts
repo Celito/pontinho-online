@@ -3,7 +3,7 @@ import { Schema } from 'mongoose';
 
 export interface IPlayer extends mongoose.Document {
   _id: Schema.Types.ObjectId;
-  playerName: string;
+  name: string;
   cards: number[];
   yourTurn: boolean;
   alreadyDraw: boolean;
@@ -12,7 +12,7 @@ export interface IPlayer extends mongoose.Document {
 
 const PlayerSchema = new Schema(
   {
-    playerName: { type: String, required: true },
+    name: { type: String, required: true },
     cards: { type: [Number], required: true, default: [] },
     yourTurn: { type: Boolean, required: true, default: false },
     alreadyDraw: { type: Boolean, required: true, default: false },

@@ -27,7 +27,10 @@ export class MatchService {
 
     if (!this._matchSocket || this._matchSocket.readyState === WebSocket.CLOSED) {
       this._matchSocket = new WebSocket('ws://localhost:3000');
-      this._matchSocket.addEventListener('message', this.receiveMatchMessage);
+      this._matchSocket.addEventListener('open', ev => {
+        this._matchSocket.send(JSON.stringify({ type: 'join', data: { matchId: gameState._id } }));
+      })
+      this._matchSocket.addEventListener('message', ev => this.receiveMatchMessage(ev));
     }
 
     const sessionPlayerId = sessionStorage.getItem(MatchService.PLAYER_ID_TOKEN);

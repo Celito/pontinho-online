@@ -3,9 +3,7 @@ import { CdkDragDrop, moveItemInArray, transferArrayItem, CdkDragStart, CdkDropL
 import { Card } from 'src/app/interfaces/Card';
 import { MatchService } from 'src/app/services/match/match.service';
 import { GameState } from 'src/app/interfaces/GameState';
-import { animate } from '@angular/animations';
 import { TweenLite } from 'gsap';
-import { UserService } from 'src/app/services/user/user.service';
 
 @Component({
   selector: 'app-table',
@@ -33,7 +31,7 @@ export class TableComponent implements OnInit {
     this.matchService.getGameState().subscribe(gs => this.updateGameState(gs));
   }
 
-  drawFromMainPile(event: CdkDragStart, drawnCard: Card) {
+  drawFromMainPile(_event: CdkDragStart, _drawnCard: Card) {
     this.matchService.drawFromMainPile().subscribe(card => {
       if (this.draggedCard) {
         this.draggedCard.id = card.id;
