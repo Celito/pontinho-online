@@ -3,19 +3,20 @@ import GameStateModel, { IGameState } from '../model/game-state';
 import IControllerBase from '../config/controller-base';
 import * as WebSocket from 'ws';
 import { Request, Response, Application, Router } from "express";
+import { Match } from '../model/match';
 
 export class GameStateController implements IControllerBase {
 
   public router = Router();
 
   public wsMatchGroups: {
-    [matchId: string]: { [playerId: string]: WebSocket }
+    [matchId: string]: Match
   } = {};
 
   initRoutes(app: Application): void {
     app.post("/api/match/create", (req, res) => this.createGame(req, res));
     app.get("/api/match", (req, res) => this.listMatches(req, res));
-    app.get("/api/match/:matchId/:playerId", (req, res) => this.getMatch(req, res));
+    app.get("/api/match/:matchId/:playerId", (req, res) => this.getGameState(req, res));
     app.post("/api/match/join", (req, res) => this.joinMatch(req, res));
   }
 
@@ -36,6 +37,7 @@ export class GameStateController implements IControllerBase {
                 .then((ngs: IGameState) => {
                   const ngsPlayers = ngs.players;
                   ngsPlayers.push(np._id);
+                  this.wsMatchGroups[ngs.id] = new Match(ngs.id);
                   GameStateModel
                     .findByIdAndUpdate(
                       ngs._id,
@@ -117,7 +119,7 @@ export class GameStateController implements IControllerBase {
       })
   }
 
-  getMatch(req: Request, res: Response) {
+  getGameState(req: Request, res: Response) {
     // TODO: Filter cards that the player shouldn't see
     GameStateModel.findOne({ _id: req.params.matchId })
       .populate('players')
@@ -130,14 +132,8 @@ export class GameStateController implements IControllerBase {
       });
   }
 
-  public addSocketToMatch(socket: WebSocket, matchId: string, playerId: string) {
-    if (this.wsMatchGroups[matchId]) {
-      this.wsMatchGroups[matchId][playerId] = socket;
-    } else {
-      this.wsMatchGroups[matchId] = { playerId: socket };
-    }
-    console.log(`Adding a new WS to the match ${matchId}. The group now has ` +
-      `${Object.keys(this.wsMatchGroups[matchId]).length} connections`);
+  public getMatch(matchId: string): Match {
+    return this.wsMatchGroups[matchId];
   }
 
   private filterGameStateForPlayer(gameState: IGameState, playerId: string): any {

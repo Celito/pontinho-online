@@ -28,7 +28,11 @@ export class TableComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    this.matchService.getGameState().subscribe(gs => this.updateGameState(gs));
+    this.matchService.getGameState().subscribe(
+      gs => {
+        this.updateGameState(gs);
+      }
+    );
   }
 
   drawFromMainPile(_event: CdkDragStart, _drawnCard: Card) {

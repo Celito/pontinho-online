@@ -36,7 +36,10 @@ wss.on('connection', (ws: WebSocket) => {
     console.log('received: %s', message);
     const decodedMessage = JSON.parse(message.toString());
     if (decodedMessage.type === 'join') {
-      gameStateController.addSocketToMatch(ws, decodedMessage.data.matchId, decodedMessage.data.playerId)
+      const playerId = decodedMessage.data.playerId;
+      const match = gameStateController.getMatch(decodedMessage.data.matchId);
+      match.addPlayerSocket(playerId, ws);
+      match.broadcast(playerId, 'joined');
     }
   });
 

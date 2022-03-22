@@ -51,14 +51,14 @@ export class MatchService {
 
   getGameState(): Observable<GameState> {
     let gameState: GameState = this._gameState;
-    const sMatchId = sessionStorage.getItem(MatchService.MATCH_ID_TOKEN);
-    const sPlayerId = sessionStorage.getItem(MatchService.PLAYER_ID_TOKEN);
+    const matchId = sessionStorage.getItem(MatchService.MATCH_ID_TOKEN);
+    const playerId = sessionStorage.getItem(MatchService.PLAYER_ID_TOKEN);
     if (gameState) {
       this._gameState = null;
       return of(gameState);
-    } else if (sMatchId && sPlayerId) {
+    } else if (matchId && playerId) {
       return this.http.get<GameState>(
-        `/api/match/${sMatchId}/${sPlayerId}`
+        `/api/match/${matchId}/${playerId}`
       ).pipe(
         map((retreivedGameState: GameState) => {
           this.setGameState(retreivedGameState, undefined);
@@ -75,7 +75,7 @@ export class MatchService {
         })
       );
     } else {
-      return of();
+      return of(undefined);
     }
   }
 
