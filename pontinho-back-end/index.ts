@@ -4,6 +4,8 @@ import * as WebSocket from 'ws';
 import { PontinhoApp } from './config/pontinho-app';
 import { GameStateController } from './controller/game-state-controller';
 import * as mongoose from 'mongoose';
+import GameStateModel from './model/game-state';
+import { GameState } from '../pontinho-app/src/app/interfaces/GameState'
 
 
 // let app = require('./config/express-config')();
@@ -38,8 +40,17 @@ wss.on('connection', (ws: WebSocket) => {
     if (decodedMessage.type === 'join') {
       const playerId = decodedMessage.data.playerId;
       const match = gameStateController.getMatch(decodedMessage.data.matchId);
-      match.addPlayerSocket(playerId, ws);
-      match.broadcast(playerId, 'joined');
+      if(match) {
+        match.addPlayerSocket(playerId, ws);
+        match.broadcast(
+          playerId,
+          {
+            type: 'joined',
+            params: { player_id: playerId },
+            state: GameStateModel.findOne({_id: match.id}) as unknown as GameState
+          }
+        );
+      }
     }
   });
 

@@ -4,6 +4,9 @@ import { Card } from '../../interfaces/Card';
 import { Observable, of, throwError } from 'rxjs';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { catchError, map } from 'rxjs/operators';
+import { Message } from 'src/app/interfaces/Message';
+import { ToastrService } from 'ngx-toastr';
+import { PlayerState } from 'src/app/interfaces/PlayerState';
 
 @Injectable({
   providedIn: 'root'
@@ -18,7 +21,10 @@ export class MatchService {
 
   userName: string;
 
-  constructor(private http: HttpClient) { }
+  constructor(
+    private http: HttpClient,
+    private toastr: ToastrService
+  ) { }
 
   setGameState(gameState: GameState, newUserName: string): void {
     sessionStorage.setItem(MatchService.MATCH_ID_TOKEN, gameState._id);
@@ -80,7 +86,17 @@ export class MatchService {
   }
 
   receiveMatchMessage(event: MessageEvent): any {
+    const data = event.data as Message;
     console.log('Received message through the socket: ', event);
+    this._gameState = data.state;
+    if(data.type === 'joined') {
+      this._gameState.players
+      this.toastr.info(`${this.getPlayer(data.params.player_id)?.name} has joined the game`);
+    }
+  }
+
+  getPlayer(player_id: string): PlayerState {
+    return this._gameState.players.find(p => p._id === player_id);
   }
 
   drawFromMainPile(): Observable<Card> {

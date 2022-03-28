@@ -1,13 +1,18 @@
 import * as WebSocket from 'ws';
+import { Message } from '../../pontinho-app/src/app/interfaces/Message'
 
 export class Match {
   private _playerSockets:{ [playerId: string]: WebSocket } = {};
+
+  get id(): string {
+    return this._matchId;
+  }
 
   constructor(
     private _matchId: string
   ) {}
 
-  public broadcast(emmiterId: string, message: string): void {
+  public broadcast(emmiterId: string, message: Message): void {
     for(const playerId in this._playerSockets) {
       if(playerId !== emmiterId) {
         this._playerSockets[playerId].send(message);

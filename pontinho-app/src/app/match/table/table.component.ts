@@ -4,6 +4,7 @@ import { Card } from 'src/app/interfaces/Card';
 import { MatchService } from 'src/app/services/match/match.service';
 import { GameState } from 'src/app/interfaces/GameState';
 import { TweenLite } from 'gsap';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-table',

@@ -22,40 +22,48 @@ export class MainComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.matchService.getGameState().subscribe(gameState => {
-      if (gameState) {
-        this.router.navigate(['match']);
-      } else {
-        this.lobbyService.getMatches().subscribe(matches => {
-          this.matches = matches;
-        });
+    this.matchService.getGameState().subscribe(
+      gameState => {
+        if (gameState) {
+          this.router.navigate(['match']);
+        } else {
+          this.lobbyService.getMatches().subscribe(matches => {
+            this.matches = matches;
+          });
+        }
       }
-    })
+    );
   }
 
   createMatch() {
     if (this.name.valid) {
-      this.lobbyService.createMatch(this.name.value).subscribe(gameState => {
-        this.matchService.setGameState(gameState, this.name.value);
-        this.router.navigate(['match']);
-      }, error => {
-        console.log(error);
-      });
+      this.lobbyService.createMatch(this.name.value).subscribe(
+        gameState => {
+          this.matchService.setGameState(gameState, this.name.value);
+          this.router.navigate(['match']);
+        },
+        error => {
+          console.log(error);
+        }
+      );
     }
   }
 
   joinMatch(match_id: string) {
     if (this.name.valid) {
       console.log(`Entrando na partida de id ${match_id} com o nome ${this.name.value}`);
-      this.lobbyService.joinMatch(match_id, this.name.value).subscribe(gameState => {
-        this.matchService.setGameState(gameState, this.name.value);
-        this.router.navigate(['match']);
-      }, error => {
-        console.log(error);
-        if (error.status === 409) {
-          this.name.setErrors({ conflict: true });
+      this.lobbyService.joinMatch(match_id, this.name.value).subscribe(
+        gameState => {
+          this.matchService.setGameState(gameState, this.name.value);
+          this.router.navigate(['match']);
+        },
+        error => {
+          console.log(error);
+          if (error.status === 409) {
+            this.name.setErrors({ conflict: true });
+          }
         }
-      });
+      );
     }
   }
 
