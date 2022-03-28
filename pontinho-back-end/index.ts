@@ -4,8 +4,6 @@ import * as WebSocket from 'ws';
 import { PontinhoApp } from './config/pontinho-app';
 import { GameStateController } from './controller/game-state-controller';
 import * as mongoose from 'mongoose';
-import GameStateModel from './model/game-state';
-import { GameState } from '../pontinho-app/src/app/interfaces/GameState'
 
 
 // let app = require('./config/express-config')();
@@ -38,21 +36,39 @@ wss.on('connection', (ws: WebSocket) => {
     console.log('received: %s', message);
     const decodedMessage = JSON.parse(message.toString());
     if (decodedMessage.type === 'join') {
-      const playerId = decodedMessage.data.playerId;
+      const playerId:string = decodedMessage.data.playerId;
       const match = gameStateController.getMatch(decodedMessage.data.matchId);
-      if(match) {
-        match.addPlayerSocket(playerId, ws);
-        match.broadcast(
-          playerId,
+      if(!playerId) {
+        console.error('missing the playerId for a join message');
+        return;
+      }
+      if(!match) {
+        console.error('can\'t find a match for the join message received');
+        return;
+      }
+      match.addPlayerSocket(playerId, ws);
+
+      GameStateController.getGameStateFromIds(match.id, playerId)
+        .subscribe(
           {
-            type: 'joined',
-            params: { player_id: playerId },
-            state: GameStateModel.findOne({_id: match.id}) as unknown as GameState
+            next: state => {
+              if(state) {
+                match.broadcast(
+                  playerId,
+                  JSON.stringify({
+                    type: 'joined',
+                    params: { player_id: playerId },
+                    state
+                  })
+                );
+              }
+            },
+            error: error => {
+              console.log('error trying to get a gamestate in a join message', error);
+            }
           }
         );
-      }
     }
   });
-
 });
 

@@ -20,6 +20,7 @@ export class MatchService {
   private _matchSocket: WebSocket;
 
   userName: string;
+  userId: string;
 
   constructor(
     private http: HttpClient,
@@ -31,19 +32,12 @@ export class MatchService {
 
     this._gameState = gameState;
 
-    if (!this._matchSocket || this._matchSocket.readyState === WebSocket.CLOSED) {
-      this._matchSocket = new WebSocket('ws://localhost:3000');
-      this._matchSocket.addEventListener('open', ev => {
-        this._matchSocket.send(JSON.stringify({ type: 'join', data: { matchId: gameState._id } }));
-      })
-      this._matchSocket.addEventListener('message', ev => this.receiveMatchMessage(ev));
-    }
-
     const sessionPlayerId = sessionStorage.getItem(MatchService.PLAYER_ID_TOKEN);
 
     if (newUserName) {
       const player = gameState.players.find(p => p.name === newUserName);
       if (player) {
+        this.userId = player._id;
         sessionStorage.setItem(
           MatchService.PLAYER_ID_TOKEN,
           player._id
@@ -52,6 +46,23 @@ export class MatchService {
       }
     } else if (!this.userName && sessionPlayerId) {
       this.userName = gameState.players.find(p => p._id === sessionPlayerId)?.name;
+      this.userId = sessionPlayerId;
+    }
+
+    if (!this._matchSocket || this._matchSocket.readyState === WebSocket.CLOSED) {
+      this._matchSocket = new WebSocket('ws://localhost:3000');
+      this._matchSocket.addEventListener('open', ev => {
+        this._matchSocket.send(
+          JSON.stringify({
+            type: 'join',
+            data: {
+              matchId: gameState._id,
+              playerId: this.userId
+            }
+          })
+        );
+      })
+      this._matchSocket.addEventListener('message', ev => this.receiveMatchMessage(ev));
     }
   }
 
@@ -86,7 +97,7 @@ export class MatchService {
   }
 
   receiveMatchMessage(event: MessageEvent): any {
-    const data = event.data as Message;
+    const data:Message = JSON.parse(event.data);
     console.log('Received message through the socket: ', event);
     this._gameState = data.state;
     if(data.type === 'joined') {

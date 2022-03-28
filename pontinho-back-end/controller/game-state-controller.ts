@@ -4,6 +4,10 @@ import IControllerBase from '../config/controller-base';
 import * as WebSocket from 'ws';
 import { Request, Response, Application, Router } from "express";
 import { Match } from '../model/match';
+import { from, map, Observable, of } from 'rxjs';
+import gameState from '../model/game-state';
+
+const observables = require('mongoose-observables');
 
 export class GameStateController implements IControllerBase {
 
@@ -16,7 +20,7 @@ export class GameStateController implements IControllerBase {
   initRoutes(app: Application): void {
     app.post("/api/match/create", (req, res) => this.createGame(req, res));
     app.get("/api/match", (req, res) => this.listMatches(req, res));
-    app.get("/api/match/:matchId/:playerId", (req, res) => this.getGameState(req, res));
+    app.get("/api/match/:matchId/:playerId", (req, res) => GameStateController.getGameState(req, res));
     app.post("/api/match/join", (req, res) => this.joinMatch(req, res));
   }
 
@@ -49,7 +53,7 @@ export class GameStateController implements IControllerBase {
                       if (updatedGameState) {
                         res.status(200)
                           .send(
-                            this.filterGameStateForPlayer(updatedGameState, np._id.toString())
+                            GameStateController.filterGameStateForPlayer(updatedGameState, np._id.toString())
                           );
                       }
                     })
@@ -107,7 +111,7 @@ export class GameStateController implements IControllerBase {
                         return;
                       }
                       res.send(
-                        this.filterGameStateForPlayer(updatedGameState, np._id.toString())
+                        GameStateController.filterGameStateForPlayer(updatedGameState, np._id.toString())
                       );
                     });
                 });
@@ -119,24 +123,40 @@ export class GameStateController implements IControllerBase {
       })
   }
 
-  getGameState(req: Request, res: Response) {
+  static getGameState(req: Request, res: Response): void {
     // TODO: Filter cards that the player shouldn't see
-    GameStateModel.findOne({ _id: req.params.matchId })
-      .populate('players')
-      .then(gameState => {
-        if (gameState) {
-          res.send(this.filterGameStateForPlayer(gameState, req.params.playerId));
-        } else {
-          res.sendStatus(404);
+    GameStateController.getGameStateFromIds(req.params.matchId, req.params.playerId)
+      .subscribe(
+        gameState => {
+          if (gameState) {
+            res.send(gameState);
+          } else {
+            res.sendStatus(404);
+          }
         }
-      });
+      );
+  }
+
+  static getGameStateFromIds(matchId: string, playerId: string): Observable<IGameState | null> {
+    return from(
+      GameStateModel.findOne({ _id: matchId }).populate('players')
+    ).pipe(
+      map(
+        gameState => {
+          if (gameState) {
+            return GameStateController.filterGameStateForPlayer(gameState, playerId);
+          }
+          return gameState;
+        }
+      )
+    );
   }
 
   public getMatch(matchId: string): Match {
     return this.wsMatchGroups[matchId];
   }
 
-  private filterGameStateForPlayer(gameState: IGameState, playerId: string): any {
+  private static filterGameStateForPlayer(gameState: IGameState, playerId: string): any {
     const filteredGameState = {
       _id: gameState._id,
       host: gameState.host,

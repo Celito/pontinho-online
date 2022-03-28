@@ -12,7 +12,7 @@ export class Match {
     private _matchId: string
   ) {}
 
-  public broadcast(emmiterId: string, message: Message): void {
+  public broadcast(emmiterId: string, message: string): void {
     for(const playerId in this._playerSockets) {
       if(playerId !== emmiterId) {
         this._playerSockets[playerId].send(message);
