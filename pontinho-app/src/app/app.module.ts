@@ -8,10 +8,14 @@ import { DragDropModule } from '@angular/cdk/drag-drop';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 import { HttpClientModule } from '@angular/common/http';
 import { ToastrModule } from 'ngx-toastr';
+import { AkitaNgDevtools } from '@datorama/akita-ngdevtools';
+import { environment } from '../environments/environment';
+import { ConnectionIconComponent } from './shared/connection-icon/connection-icon.component';
 
 @NgModule({
   declarations: [
-    AppComponent
+    AppComponent,
+    ConnectionIconComponent
   ],
   imports: [
     BrowserModule,
@@ -20,7 +24,8 @@ import { ToastrModule } from 'ngx-toastr';
     MatchModule,
     BrowserAnimationsModule,
     HttpClientModule,
-    ToastrModule.forRoot()
+    ToastrModule.forRoot(),
+    environment.production ? [] : AkitaNgDevtools.forRoot()
   ],
   providers: [],
   bootstrap: [AppComponent]

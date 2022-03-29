@@ -1,13 +1,9 @@
 import PlayerModel, { IPlayer } from '../model/player';
 import GameStateModel, { IGameState } from '../model/game-state';
 import IControllerBase from '../config/controller-base';
-import * as WebSocket from 'ws';
 import { Request, Response, Application, Router } from "express";
 import { Match } from '../model/match';
-import { from, map, Observable, of } from 'rxjs';
-import gameState from '../model/game-state';
-
-const observables = require('mongoose-observables');
+import { from, map, Observable } from 'rxjs';
 
 export class GameStateController implements IControllerBase {
 
@@ -153,6 +149,9 @@ export class GameStateController implements IControllerBase {
   }
 
   public getMatch(matchId: string): Match {
+    if (!this.wsMatchGroups[matchId]) {
+      this.wsMatchGroups[matchId] = new Match(matchId);
+    }
     return this.wsMatchGroups[matchId];
   }
 

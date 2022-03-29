@@ -1,4 +1,3 @@
-
 import * as http from 'http';
 import * as WebSocket from 'ws';
 import { PontinhoApp } from './config/pontinho-app';

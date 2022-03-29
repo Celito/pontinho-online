@@ -144,5 +144,8 @@
       }
     }
   },
-  "defaultProject": "pontinho-app"
+  "defaultProject": "pontinho-app",
+  "cli": {
+    "defaultCollection": "@datorama/akita"
+  }
 }

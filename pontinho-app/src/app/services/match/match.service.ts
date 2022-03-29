@@ -63,6 +63,7 @@ export class MatchService {
         );
       })
       this._matchSocket.addEventListener('message', ev => this.receiveMatchMessage(ev));
+
     }
   }
 
