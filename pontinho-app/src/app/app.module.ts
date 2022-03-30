@@ -10,12 +10,10 @@ import { HttpClientModule } from '@angular/common/http';
 import { ToastrModule } from 'ngx-toastr';
 import { AkitaNgDevtools } from '@datorama/akita-ngdevtools';
 import { environment } from '../environments/environment';
-import { ConnectionIconComponent } from './shared/connection-icon/connection-icon.component';
 
 @NgModule({
   declarations: [
-    AppComponent,
-    ConnectionIconComponent
+    AppComponent
   ],
   imports: [
     BrowserModule,
@@ -26,6 +24,8 @@ import { ConnectionIconComponent } from './shared/connection-icon/connection-ico
     HttpClientModule,
     ToastrModule.forRoot(),
     environment.production ? [] : AkitaNgDevtools.forRoot()
+  ],
+  exports: [
   ],
   providers: [],
   bootstrap: [AppComponent]
