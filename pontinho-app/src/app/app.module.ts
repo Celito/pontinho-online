@@ -8,7 +8,6 @@ import { DragDropModule } from '@angular/cdk/drag-drop';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations'
 import { HttpClientModule } from '@angular/common/http';
 import { ToastrModule } from 'ngx-toastr';
-import { AkitaNgDevtools } from '@datorama/akita-ngdevtools';
 import { environment } from '../environments/environment';
 
 @NgModule({
@@ -22,8 +21,7 @@ import { environment } from '../environments/environment';
     MatchModule,
     BrowserAnimationsModule,
     HttpClientModule,
-    ToastrModule.forRoot(),
-    environment.production ? [] : AkitaNgDevtools.forRoot()
+    ToastrModule.forRoot()
   ],
   exports: [
   ],
