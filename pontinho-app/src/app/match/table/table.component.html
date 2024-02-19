@@ -1,23 +1,43 @@
 <div class="cloth">
-  <div class="top">
-    <div #mainPile="cdkDropList" class="pile" cdkDropList [cdkDropListConnectedTo]="[playerHand]"
-      [cdkDropListData]="pile" cdkDropListSortingDisabled id="mainPile"
-      (cdkDropListDropped)="dropBackToMainPile($event)">
-      <div appCard *ngFor="let listCard of pile; last as lastCard" class="card"
-        [flip]="listCard.id ? 'up' : 'down'" [data]="listCard" cdkDrag [cdkDragDisabled]="!lastCard"
-        (cdkDragStarted)="drawFromMainPile($event, listCard)"></div>
-    </div>
-    <div #discardPile="cdkDropList" class="pile discard" cdkDropList cdkDropListSortingDisabled
-      id="discardPile" [cdkDropListConnectedTo]="[playerHand]" [cdkDropListData]="discard"
-      (cdkDropListDropped)="dropToDiscard($event)">
-      <div appCard *ngFor="let listCard of discard; last as lastCard" class="card" [data]="listCard"
-        cdkDrag [cdkDragDisabled]="!lastCard"></div>
+  <div class="top-area">
+    <div *ngFor="let topPlayer of playersOnTheTop" class="player-area">
+      <div class="player-name">{{topPlayer}}</div>
+      <div class="player-hand"></div>
     </div>
   </div>
-  <div #playerHand="cdkDropList" class="player-area" cdkDropList id="playerHand"
-    cdkDropListOrientation="horizontal" [cdkDropListData]="playerCards"
-    [cdkDropListConnectedTo]="[discardPile]" (cdkDropListDropped)="dropToPlayerHand($event)">
-    <div class="player-hand">
+  <div class="mid-area">
+    <div class="left-area">
+      <div *ngFor="let leftPlayer of playersOnTheLeft" class="player-area">
+        <div class="player-name">{{leftPlayer}}</div>
+        <div class="player-hand"></div>
+      </div>
+    </div>
+    <div class="center-area">
+      <div #mainPile="cdkDropList" class="pile" cdkDropList [cdkDropListConnectedTo]="[playerHand]"
+        [cdkDropListData]="pile" cdkDropListSortingDisabled id="mainPile"
+        (cdkDropListDropped)="dropBackToMainPile($event)">
+        <div appCard *ngFor="let listCard of pile; last as lastCard" class="card"
+          [flip]="listCard.id ? 'up' : 'down'" [data]="listCard" cdkDrag [cdkDragDisabled]="!lastCard"
+          (cdkDragStarted)="drawFromMainPile($event, listCard)"></div>
+      </div>
+      <div #discardPile="cdkDropList" class="pile discard" cdkDropList cdkDropListSortingDisabled
+        id="discardPile" [cdkDropListConnectedTo]="[playerHand]" [cdkDropListData]="discard"
+        (cdkDropListDropped)="dropToDiscard($event)">
+        <div appCard *ngFor="let listCard of discard; last as lastCard" class="card" [data]="listCard"
+          cdkDrag [cdkDragDisabled]="!lastCard"></div>
+      </div>
+    </div>
+    <div class="right-area">
+      <div *ngFor="let rightPlayer of playersOnTheRight" class="player-area">
+        <div class="player-hand"></div>
+        <div class="player-name">{{rightPlayer}}</div>
+      </div>
+    </div>
+  </div>
+  <div class="bottom-area player-area">
+    <div class="player-hand"  #playerHand="cdkDropList" cdkDropList id="playerHand"
+      cdkDropListOrientation="horizontal" [cdkDropListData]="playerCards"
+      [cdkDropListConnectedTo]="[discardPile]" (cdkDropListDropped)="dropToPlayerHand($event)">
       <div appCard class="card" *ngFor="let card of playerCards" cdkDrag [data]="card"
         [flip]="card.id ? 'up' : 'down'"></div>
     </div>

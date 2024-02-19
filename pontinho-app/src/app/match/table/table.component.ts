@@ -17,9 +17,13 @@ export class TableComponent implements OnInit {
   playerCards = [];
   pile: Card[] = [];
   discard = [];
-  playerName = "Celito";
+  playerName: string;
   draggedCardNumber: number = 0;
   draggedCard: Card;
+
+  playersOnTheRight = ['Player 2']
+  playersOnTheTop = ['Player 3', 'Player 4']
+  playersOnTheLeft = ['Player 5']
 
   @ViewChild('playerHand') playeHand: CdkDropList;
   @ViewChild('mainPile') mainPile: CdkDropList;

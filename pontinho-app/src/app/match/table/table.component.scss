@@ -6,18 +6,86 @@
   background-repeat:no-repeat;
   background-position: center center;
   background-size: cover;
-  padding-top: 4vh;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
 
-  .top {
+  .top-area {
     display: flex;
-    margin-right: auto;
-    margin-left: auto;
-    width: fit-content;
+    flex-direction: row-reverse;
+    gap: 10px;
+    justify-content: center;
+
+    .player-area {
+      .player-hand {
+        width: 180px;
+      }
+
+      .player-name {
+        justify-content: end;
+        display: flex;
+        padding-right: 10px; 
+      }
+    }
   }
 
+  .mid-area {
+    padding-top: 4vh;
+    display: flex;
+    justify-content: space-between;
+
+    .left-area, .right-area {
+      display:flex;
+      gap: 10px;
+
+      .player-area {
+        flex-direction: row;
+        .player-name {
+          width: fit-content;   
+          width: 0;
+          height: 20px;
+        }
+
+        .player-hand {
+          padding: 1vw 1vw 1vw 1vw;
+          height: 180px;
+          width: 0px;
+        }
+      }
+    }
+
+    .left-area {
+      flex-direction: column;
+
+      .player-area .player-name {
+        -webkit-transform: rotate(90deg); /* Safari and Chrome */
+        -moz-transform: rotate(90deg);   /* Firefox */
+        -ms-transform: rotate(90deg);   /* IE 9 */
+        -o-transform: rotate(90deg);   /* Opera */
+        transform: rotate(90deg);
+      }
+    }
+
+    .right-area {
+      flex-direction: column-reverse;
+
+      .player-area .player-name {
+        margin-top: auto;
+        -webkit-transform: rotate(270deg); /* Safari and Chrome */
+        -moz-transform: rotate(270deg);   /* Firefox */
+        -ms-transform: rotate(270deg);   /* IE 9 */
+        -o-transform: rotate(270deg);   /* Opera */
+        transform: rotate(270deg);
+      }
+    }
+
+    .center-area {
+      display: flex;
+      width: fit-content;
+    }
+  
+  }
+  
   .pile {
     display: flex;
     flex-direction: column-reverse;
@@ -41,8 +109,8 @@
   }
   
   .player-area {
-    margin-right: auto;
-    margin-left: auto;
+    display: flex;
+    flex-direction: column;
     .player-hand {
       display: flex;
       justify-content: center;
@@ -52,6 +120,15 @@
       border-radius: 20px;
       left: calc(28.5vw - 6px);
     }
+    .player-name {
+      text-wrap: nowrap;
+      padding-left: 20px;
+    }
+  }
+
+  .bottom-area {
+    margin-right: auto;
+    margin-left: auto;
   }
 
   .card {
