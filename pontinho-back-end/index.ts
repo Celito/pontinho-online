@@ -35,13 +35,13 @@ wss.on('connection', (ws: WebSocket) => {
     console.log('received: %s', message);
     const decodedMessage = JSON.parse(message.toString());
     if (decodedMessage.type === 'join') {
-      const playerId:string = decodedMessage.data.playerId;
+      const playerId: string = decodedMessage.data.playerId;
       const match = gameStateController.getMatch(decodedMessage.data.matchId);
-      if(!playerId) {
+      if (!playerId) {
         console.error('missing the playerId for a join message');
         return;
       }
-      if(!match) {
+      if (!match) {
         console.error('can\'t find a match for the join message received');
         return;
       }
@@ -51,7 +51,7 @@ wss.on('connection', (ws: WebSocket) => {
         .subscribe(
           {
             next: state => {
-              if(state) {
+              if (state) {
                 match.broadcast(
                   playerId,
                   JSON.stringify({

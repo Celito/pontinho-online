@@ -1,0 +1,26 @@
+## PRE-REQUISITES
+
+This server uses MongoDB Community Server, before running the server please install it through the following link:
+
+https://www.mongodb.com/try/download/community
+
+or install it using brew:
+
+```
+brew tap mongodb/brew
+brew install mongodb-community
+```
+
+## STARTING THE SERVER
+
+Before starting your server, make sure you start the MongoDB by running it, or if you have installed it using brew you can enter:
+
+```
+brew services start mongodb-community
+```
+
+After MongoDB is running you can start the server by running:
+
+```
+npm start
+```
