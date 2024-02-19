@@ -104,6 +104,9 @@ export class TableComponent implements OnInit {
   }
 
   updateGameState(gameState: GameState) {
+    console.log(gameState)
+    console.log(this.matchService.userName);
+    this.playerName = this.matchService.userName;
     this.pile = gameState.mainPile.cards;
     this.gameState = gameState;
 

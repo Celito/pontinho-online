@@ -14,12 +14,13 @@
         cdkDrag [cdkDragDisabled]="!lastCard"></div>
     </div>
   </div>
-  <div #playerHand="cdkDropList" class="player-hand" cdkDropList id="playerHand"
+  <div #playerHand="cdkDropList" class="player-area" cdkDropList id="playerHand"
     cdkDropListOrientation="horizontal" [cdkDropListData]="playerCards"
     [cdkDropListConnectedTo]="[discardPile]" (cdkDropListDropped)="dropToPlayerHand($event)">
-    <div>
+    <div class="player-hand">
       <div appCard class="card" *ngFor="let card of playerCards" cdkDrag [data]="card"
         [flip]="card.id ? 'up' : 'down'"></div>
     </div>
+    <div class="player-name">{{ playerName }}</div>
   </div>
 </div>

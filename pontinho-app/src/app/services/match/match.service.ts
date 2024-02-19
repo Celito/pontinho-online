@@ -50,6 +50,7 @@ export class MatchService {
     }
 
     if (!this._matchSocket || this._matchSocket.readyState === WebSocket.CLOSED) {
+      console.log('starting connection to websocket')
       this._matchSocket = new WebSocket('ws://localhost:3000');
       this._matchSocket.addEventListener('open', ev => {
         this._matchSocket.send(
@@ -98,10 +99,10 @@ export class MatchService {
   }
 
   receiveMatchMessage(event: MessageEvent): any {
-    const data:Message = JSON.parse(event.data);
+    const data: Message = JSON.parse(event.data);
     console.log('Received message through the socket: ', event);
     this._gameState = data.state;
-    if(data.type === 'joined') {
+    if (data.type === 'joined') {
       this._gameState.players
       this.toastr.info(`${this.getPlayer(data.params.player_id)?.name} has joined the game`);
     }
