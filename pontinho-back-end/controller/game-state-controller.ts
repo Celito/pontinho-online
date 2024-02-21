@@ -1,4 +1,4 @@
-import PlayerModel, { IPlayer } from '../model/player';
+import PlayerModel, { IPlayer, PlayerStatus } from '../model/player';
 import GameStateModel, { IGameState } from '../model/game-state';
 import IControllerBase from '../config/controller-base';
 import { Request, Response, Application, Router } from "express";
@@ -90,10 +90,20 @@ export class GameStateController implements IControllerBase {
     }
   }
 
-  static async getGameStateFromIds(matchId: string, playerId: string): Promise<IGameState | null> {
+  static async getGameStateFromIds(matchId: string, playerId?: string, playerStatus?: { [playerId: string]: PlayerStatus }): Promise<IGameState | null> {
     try {
-      const gameState = await GameStateModel.findOne({ _id: matchId }).populate('players')
-      if (gameState) {
+      const gameState = (await GameStateModel.findOne({ _id: matchId }).populate('players'))?.toObject({ versionKey: false }) as IGameState
+      if (gameState && playerStatus) {
+        for (const playerIndex in gameState.players) {
+          const player: IPlayer = JSON.parse(JSON.stringify(gameState.players[playerIndex]))
+          gameState.players[playerIndex] = {
+            ...player,
+            status: playerStatus[player._id] || 'Offline'
+          } as IPlayer
+          console.log(`setting player ${player.name} status to ${(gameState.players[playerIndex] as IPlayer).status}`)
+        }
+      }
+      if (gameState && playerId) {
         return GameStateController.filterGameStateForPlayer(gameState, playerId);
       }
       return gameState;
@@ -110,25 +120,20 @@ export class GameStateController implements IControllerBase {
     return this.wsMatchGroups[matchId];
   }
 
-  private static filterGameStateForPlayer(gameState: IGameState, playerId: string): any {
+  public static filterGameStateForPlayer(gameState: IGameState, playerId: string): any {
+
     const filteredGameState = {
-      _id: gameState._id,
-      host: gameState.host,
+      ...gameState,
       players: gameState.players.map(p => {
         const castP = p as IPlayer;
         return {
-          _id: castP._id,
-          name: castP.name,
-          yourTurn: castP.yourTurn,
-          alreadyDraw: castP.alreadyDraw,
-          scores: castP.alreadyDraw,
-          cards: castP.cards?.map(c => castP._id.toString() === playerId ? c : 0) || []
+          ...castP,
+          cards: castP.cards?.map(c => castP._id === playerId ? c : 0) || []
         };
       }),
       mainPile: {
         cards: gameState.mainPile.cards.map(_ => 0)
-      },
-      discard: gameState.discard
+      }
     }
     return filteredGameState;
   }

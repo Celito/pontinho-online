@@ -1,13 +1,16 @@
 import * as mongoose from 'mongoose';
 import { Schema } from 'mongoose';
 
-export interface IPlayer extends mongoose.Document {
-  _id: Schema.Types.ObjectId;
+export type PlayerStatus = 'Online' | 'Offline';
+
+export interface IPlayer {
+  _id: string;
   name: string;
   cards: number[];
   yourTurn: boolean;
   alreadyDraw: boolean;
   scores: number;
+  status?: PlayerStatus;
 }
 
 const PlayerSchema = new Schema(

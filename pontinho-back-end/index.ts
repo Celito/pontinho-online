@@ -47,14 +47,15 @@ wss.on('connection', (ws: WebSocket) => {
       match.addPlayerSocket(playerId, ws);
 
       try {
-        const state = await GameStateController.getGameStateFromIds(match.id, playerId);
+        const state = await GameStateController.getGameStateFromIds(match.id, undefined, match.playerStatus);
+        console.log('state for the broadcast: ', JSON.stringify(state))
         if (state) {
           match.broadcast(
-            JSON.stringify({
+            {
               type: 'joined',
               params: { player_id: playerId },
               state
-            })
+            }
           );
         }
       } catch (e) {

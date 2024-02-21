@@ -6,7 +6,8 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { catchError, map } from 'rxjs/operators';
 import { Message } from 'src/app/interfaces/Message';
 import { ToastrService } from 'ngx-toastr';
-import { PlayerState } from 'src/app/interfaces/PlayerState';
+import { PlayerState, PlayerStatus } from 'src/app/interfaces/PlayerState';
+
 
 @Injectable({
   providedIn: 'root'
@@ -22,6 +23,8 @@ export class MatchService {
   private _gameStateSub: BehaviorSubject<GameState> = new BehaviorSubject(undefined);
 
   gameState$: Observable<GameState> = this._gameStateSub.asObservable()
+
+  playersStatus$: Observable<PlayerStatus>[] = []
 
   userName: string;
   userId: string;

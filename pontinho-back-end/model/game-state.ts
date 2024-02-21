@@ -2,7 +2,8 @@ import * as mongoose from 'mongoose';
 import { Schema } from 'mongoose';
 import { IPlayer } from './player';
 
-export interface IGameState extends mongoose.Document {
+export interface IGameState {
+  _id: string;
   host: string;
   players: (IPlayer['_id'] | IPlayer)[];
   mainPile: {
