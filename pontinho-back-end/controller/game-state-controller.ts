@@ -44,6 +44,7 @@ export class GameStateController implements IControllerBase {
   }
 
   async listMatches(_: Request, res: Response) {
+    console.log('starting to list matches');
     const gameState = await GameStateModel.find() || []
     const resJson = gameState.map((gs) => {
       return { _id: gs._id, host: gs.host }
@@ -79,33 +80,27 @@ export class GameStateController implements IControllerBase {
     );
   }
 
-  static getGameState(req: Request, res: Response): void {
+  static async getGameState(req: Request, res: Response): Promise<void> {
     // TODO: Filter cards that the player shouldn't see
-    GameStateController.getGameStateFromIds(req.params.matchId, req.params.playerId)
-      .subscribe(
-        gameState => {
-          if (gameState) {
-            res.send(gameState);
-          } else {
-            res.sendStatus(404);
-          }
-        }
-      );
+    const gameState = await GameStateController.getGameStateFromIds(req.params.matchId, req.params.playerId)
+    if (gameState) {
+      res.send(gameState);
+    } else {
+      res.sendStatus(404);
+    }
   }
 
-  static getGameStateFromIds(matchId: string, playerId: string): Observable<IGameState | null> {
-    return from(
-      GameStateModel.findOne({ _id: matchId }).populate('players')
-    ).pipe(
-      map(
-        gameState => {
-          if (gameState) {
-            return GameStateController.filterGameStateForPlayer(gameState, playerId);
-          }
-          return gameState;
-        }
-      )
-    );
+  static async getGameStateFromIds(matchId: string, playerId: string): Promise<IGameState | null> {
+    try {
+      const gameState = await GameStateModel.findOne({ _id: matchId }).populate('players')
+      if (gameState) {
+        return GameStateController.filterGameStateForPlayer(gameState, playerId);
+      }
+      return gameState;
+    } catch (e: unknown) {
+      console.log(`Error while trying to get the game state from matchId: "${matchId}", playerId: "${playerId}"`)
+      return null
+    }
   }
 
   public getMatch(matchId: string): Match {

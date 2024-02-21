@@ -2,7 +2,7 @@ import * as WebSocket from 'ws';
 import { Message } from '../../pontinho-app/src/app/interfaces/Message'
 
 export class Match {
-  private _playerSockets:{ [playerId: string]: WebSocket } = {};
+  private _playerSockets: { [playerId: string]: WebSocket } = {};
 
   get id(): string {
     return this._matchId;
@@ -10,18 +10,17 @@ export class Match {
 
   constructor(
     private _matchId: string
-  ) {}
+  ) { }
 
-  public broadcast(emmiterId: string, message: string): void {
-    for(const playerId in this._playerSockets) {
-      if(playerId !== emmiterId) {
-        this._playerSockets[playerId].send(message);
-      }
+  public broadcast(message: string): void {
+    console.log(`broadcasting to ${Object.keys(this._playerSockets).length} players`)
+    for (const playerId in this._playerSockets) {
+      this._playerSockets[playerId].send(message);
     }
   }
 
-  public addPlayerSocket(playerId:string, socket: WebSocket):boolean {
-    if(playerId in this._playerSockets) {
+  public addPlayerSocket(playerId: string, socket: WebSocket): boolean {
+    if (playerId in this._playerSockets) {
       return false;
     }
     this._playerSockets[playerId] = socket;

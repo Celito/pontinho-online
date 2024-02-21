@@ -22,17 +22,16 @@ export class MainComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.matchService.getGameState().subscribe(
+    this.matchService.fetchGameState().subscribe(
       gameState => {
         if (gameState) {
           this.router.navigate(['match']);
-        } else {
-          this.lobbyService.getMatches().subscribe(matches => {
-            this.matches = matches;
-          });
         }
       }
     );
+    this.lobbyService.getMatches().subscribe(matches => {
+      this.matches = matches;
+    });
   }
 
   createMatch() {

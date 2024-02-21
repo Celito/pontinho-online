@@ -4,7 +4,10 @@ import { Card } from 'src/app/interfaces/Card';
 import { MatchService } from 'src/app/services/match/match.service';
 import { GameState } from 'src/app/interfaces/GameState';
 import { TweenLite } from 'gsap';
-import { ToastrService } from 'ngx-toastr';
+
+const playersDistributionConfig = [
+  [0, 1, 0], [1, 0, 1], [1, 1, 1], [1, 2, 1], [2, 1, 2], [2, 2, 2], [2, 3, 2], [3, 2, 3], [3, 3, 3]
+]
 
 @Component({
   selector: 'app-table',
@@ -21,9 +24,9 @@ export class TableComponent implements OnInit {
   draggedCardNumber: number = 0;
   draggedCard: Card;
 
-  playersOnTheRight = ['Player 2']
-  playersOnTheTop = ['Player 3', 'Player 4']
-  playersOnTheLeft = ['Player 5']
+  playersOnTheRight = []
+  playersOnTheTop = []
+  playersOnTheLeft = []
 
   @ViewChild('playerHand') playeHand: CdkDropList;
   @ViewChild('mainPile') mainPile: CdkDropList;
@@ -33,9 +36,12 @@ export class TableComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    this.matchService.getGameState().subscribe(
+    this.matchService.gameState$.subscribe(
       gs => {
-        this.updateGameState(gs);
+        console.log('game state received in the table', gs)
+        if (gs) {
+          this.updateGameState(gs);
+        }
       }
     );
   }
@@ -114,9 +120,20 @@ export class TableComponent implements OnInit {
     this.pile = gameState.mainPile.cards;
     this.gameState = gameState;
 
-    for (const player of gameState.players) {
-      if (player.name === this.matchService.userName) {
+    const otherPlayers = []
+
+    for (let index = 0; index < gameState.players.length; index++) {
+      const player = gameState.players[index]
+      if (player._id === this.matchService.userId) {
         this.playerCards = player.cards;
+        if (gameState.players.length > 1) {
+          otherPlayers.push(...gameState.players.slice(index + 1))
+          otherPlayers.push(...gameState.players.slice(0, index))
+          const distribution = playersDistributionConfig[otherPlayers.length - 1]
+          this.playersOnTheRight = otherPlayers.splice(0, distribution[0]).map(p => p.name)
+          this.playersOnTheTop = otherPlayers.splice(0, distribution[1]).map(p => p.name)
+          this.playersOnTheLeft = otherPlayers.splice(0, distribution[2]).map(p => p.name)
+        }
       }
     }
   }

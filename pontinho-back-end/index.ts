@@ -30,9 +30,8 @@ const wss = new WebSocket.Server({ server });
 
 wss.on('connection', (ws: WebSocket) => {
   console.log(`New socket connection. Now server has ${wss.clients.size} connections.`);
-
-  ws.on('message', (message: WebSocket.Data) => {
-    console.log('received: %s', message);
+  ws.on('message', async (message: WebSocket.Data) => {
+    console.log('received:', message);
     const decodedMessage = JSON.parse(message.toString());
     if (decodedMessage.type === 'join') {
       const playerId: string = decodedMessage.data.playerId;
@@ -47,26 +46,20 @@ wss.on('connection', (ws: WebSocket) => {
       }
       match.addPlayerSocket(playerId, ws);
 
-      GameStateController.getGameStateFromIds(match.id, playerId)
-        .subscribe(
-          {
-            next: state => {
-              if (state) {
-                match.broadcast(
-                  playerId,
-                  JSON.stringify({
-                    type: 'joined',
-                    params: { player_id: playerId },
-                    state
-                  })
-                );
-              }
-            },
-            error: error => {
-              console.log('error trying to get a gamestate in a join message', error);
-            }
-          }
-        );
+      try {
+        const state = await GameStateController.getGameStateFromIds(match.id, playerId);
+        if (state) {
+          match.broadcast(
+            JSON.stringify({
+              type: 'joined',
+              params: { player_id: playerId },
+              state
+            })
+          );
+        }
+      } catch (e) {
+        console.log('Error while trying join a match', e)
+      }
     }
   });
 });
