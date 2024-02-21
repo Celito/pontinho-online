@@ -39,7 +39,7 @@ export class GameStateController implements IControllerBase {
       return res.status(500).send("Failed to generate the game state");
     }
     res.status(200).send(
-      GameStateController.filterGameStateForPlayer(updatedGameState, newPlayer._id.toString())
+      GameStateController.filterGameStateForPlayer(updatedGameState.toObject({ versionKey: false }) as IGameState, newPlayer._id.toString())
     );
   }
 
@@ -76,7 +76,7 @@ export class GameStateController implements IControllerBase {
       return res.status(500).send("Failed to join the match");
     }
     res.send(
-      GameStateController.filterGameStateForPlayer(updatedGameState, newPlayer._id.toString())
+      GameStateController.filterGameStateForPlayer(updatedGameState.toObject({ versionKey: false }) as IGameState, newPlayer._id.toString())
     );
   }
 

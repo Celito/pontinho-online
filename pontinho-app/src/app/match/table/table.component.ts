@@ -4,6 +4,8 @@ import { Card } from 'src/app/interfaces/Card';
 import { MatchService } from 'src/app/services/match/match.service';
 import { GameState } from 'src/app/interfaces/GameState';
 import { TweenLite } from 'gsap';
+import { Observable, of } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 const playersDistributionConfig = [
   [0, 1, 0], [1, 0, 1], [1, 1, 1], [1, 2, 1], [2, 1, 2], [2, 2, 2], [2, 3, 2], [3, 2, 3], [3, 3, 3]
@@ -44,6 +46,14 @@ export class TableComponent implements OnInit {
         }
       }
     );
+  }
+
+  getPlayerStatus(playerId?: string): Observable<string> {
+    const statusObs = this.matchService.playersStatus$[playerId || this.matchService.userId]
+    if (statusObs) {
+      return statusObs.pipe(map(status => status === 'Online' ? ' C ' : ' D '))
+    }
+    return of(' U ')
   }
 
   drawFromMainPile(_event: CdkDragStart, _drawnCard: Card) {
@@ -114,8 +124,6 @@ export class TableComponent implements OnInit {
   }
 
   updateGameState(gameState: GameState) {
-    console.log(gameState)
-    console.log(this.matchService.userName);
     this.playerName = this.matchService.userName;
     this.pile = gameState.mainPile.cards;
     this.gameState = gameState;
@@ -130,9 +138,9 @@ export class TableComponent implements OnInit {
           otherPlayers.push(...gameState.players.slice(index + 1))
           otherPlayers.push(...gameState.players.slice(0, index))
           const distribution = playersDistributionConfig[otherPlayers.length - 1]
-          this.playersOnTheRight = otherPlayers.splice(0, distribution[0]).map(p => p.name)
-          this.playersOnTheTop = otherPlayers.splice(0, distribution[1]).map(p => p.name)
-          this.playersOnTheLeft = otherPlayers.splice(0, distribution[2]).map(p => p.name)
+          this.playersOnTheRight = otherPlayers.splice(0, distribution[0])
+          this.playersOnTheTop = otherPlayers.splice(0, distribution[1])
+          this.playersOnTheLeft = otherPlayers.splice(0, distribution[2])
         }
       }
     }

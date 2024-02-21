@@ -21,10 +21,11 @@ export class MatchService {
   private _matchSocket: WebSocket;
 
   private _gameStateSub: BehaviorSubject<GameState> = new BehaviorSubject(undefined);
+  private _playersStatusSubs: { [playerId: string]: BehaviorSubject<PlayerStatus> } = {}
 
   gameState$: Observable<GameState> = this._gameStateSub.asObservable()
 
-  playersStatus$: Observable<PlayerStatus>[] = []
+  playersStatus$: { [playerId: string]: Observable<PlayerStatus> } = {}
 
   userName: string;
   userId: string;
@@ -47,7 +48,7 @@ export class MatchService {
     this._matchSocket = new WebSocket('ws://localhost:3000');
     this._matchSocket.addEventListener('message', ev => this.receiveMatchMessage(ev));
     this._matchSocket.addEventListener('open', ev => {
-      console.log('socket connection opened', ev)
+      console.log('socket connection opened', ev, this._matchSocket.readyState)
       this._matchSocket.send(
         JSON.stringify({
           type: 'join',
@@ -73,6 +74,15 @@ export class MatchService {
     this._gameState = gameState;
 
     const sessionPlayerId = sessionStorage.getItem(MatchService.PLAYER_ID_TOKEN);
+
+    for (const player of gameState.players) {
+      if (!this._playersStatusSubs[player._id]) {
+        this._playersStatusSubs[player._id] = new BehaviorSubject(player.status)
+        this.playersStatus$[player._id] = this._playersStatusSubs[player._id].asObservable()
+      } else {
+        this._playersStatusSubs[player._id].next(player.status)
+      }
+    }
 
     if (newUserName) {
       const player = gameState.players.find(p => p.name === newUserName);

@@ -43,11 +43,12 @@ export class Match {
   }
 
   public addPlayerSocket(playerId: string, socket: WebSocket): boolean {
-    if (playerId in this._playerSockets) {
-      return false;
+    const alreadyIn = playerId in this._playerSockets
+    if (alreadyIn) {
+      delete this._playerSockets[playerId]
     }
     this._playerSockets[playerId] = socket;
-    console.log(`Adding a new WS to the match ${this._matchId}. The group now has ` +
+    console.log(`${alreadyIn ? 'Re-adding' : 'Adding a new'} WS to the match ${this._matchId}. The group now has ` +
       `${Object.keys(this._playerSockets).length} connections`);
     return true;
   }

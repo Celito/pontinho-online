@@ -1,14 +1,14 @@
 <div class="cloth">
   <div class="top-area">
     <div *ngFor="let topPlayer of playersOnTheTop" class="player-area">
-      <div class="player-name">{{topPlayer}}</div>
+      <div class="player-name">{{topPlayer.name}}<span>{{ (getPlayerStatus(topPlayer._id) | async) }}</span></div>
       <div class="player-hand"></div>
     </div>
   </div>
   <div class="mid-area">
     <div class="left-area">
       <div *ngFor="let leftPlayer of playersOnTheLeft" class="player-area">
-        <div class="player-name">{{leftPlayer}}</div>
+        <div class="player-name">{{leftPlayer.name}}<span>{{ (getPlayerStatus(leftPlayer._id) | async) }}</span></div>
         <div class="player-hand"></div>
       </div>
     </div>
@@ -30,7 +30,7 @@
     <div class="right-area">
       <div *ngFor="let rightPlayer of playersOnTheRight" class="player-area">
         <div class="player-hand"></div>
-        <div class="player-name">{{rightPlayer}}</div>
+        <div class="player-name">{{rightPlayer.name}}<span>{{ (getPlayerStatus(rightPlayer._id) | async) }}</span></div>
       </div>
     </div>
   </div>
@@ -41,6 +41,6 @@
       <div appCard class="card" *ngFor="let card of playerCards" cdkDrag [data]="card"
         [flip]="card.id ? 'up' : 'down'"></div>
     </div>
-    <div class="player-name">{{ playerName }}</div>
+    <div class="player-name"><span>{{ (getPlayerStatus() | async) }}</span>{{ playerName }}</div>
   </div>
 </div>

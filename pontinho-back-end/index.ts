@@ -44,7 +44,8 @@ wss.on('connection', (ws: WebSocket) => {
         console.error('can\'t find a match for the join message received');
         return;
       }
-      match.addPlayerSocket(playerId, ws);
+      const addResult = match.addPlayerSocket(playerId, ws);
+      console.log('add player to match restult: ', addResult);
 
       try {
         const state = await GameStateController.getGameStateFromIds(match.id, undefined, match.playerStatus);
