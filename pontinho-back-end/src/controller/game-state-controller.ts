@@ -3,9 +3,8 @@ import GameStateModel, { IGameState } from '../model/game-state';
 import IControllerBase from '../config/controller-base';
 import { Request, Response, Application, Router } from "express";
 import { Match } from '../model/match';
-import { from, map, Observable } from 'rxjs';
 
-export class GameStateController implements IControllerBase {
+class GameStateController implements IControllerBase {
 
   public router = Router();
 
@@ -16,7 +15,7 @@ export class GameStateController implements IControllerBase {
   initRoutes(app: Application): void {
     app.post("/api/match/create", (req, res) => this.createGame(req, res));
     app.get("/api/match", (req, res) => this.listMatches(req, res));
-    app.get("/api/match/:matchId/:playerId", (req, res) => GameStateController.getGameState(req, res));
+    app.get("/api/match/:matchId/:playerId", (req, res) => this.getGameState(req, res));
     app.post("/api/match/join", (req, res) => this.joinMatch(req, res));
   }
 
@@ -39,7 +38,7 @@ export class GameStateController implements IControllerBase {
       return res.status(500).send("Failed to generate the game state");
     }
     res.status(200).send(
-      GameStateController.filterGameStateForPlayer(updatedGameState.toObject({ versionKey: false }) as IGameState, newPlayer._id.toString())
+      this.filterGameStateForPlayer(updatedGameState.toObject({ versionKey: false }) as IGameState, newPlayer._id.toString())
     );
   }
 
@@ -76,13 +75,13 @@ export class GameStateController implements IControllerBase {
       return res.status(500).send("Failed to join the match");
     }
     res.send(
-      GameStateController.filterGameStateForPlayer(updatedGameState.toObject({ versionKey: false }) as IGameState, newPlayer._id.toString())
+      this.filterGameStateForPlayer(updatedGameState.toObject({ versionKey: false }) as IGameState, newPlayer._id.toString())
     );
   }
 
-  static async getGameState(req: Request, res: Response): Promise<void> {
+  async getGameState(req: Request, res: Response): Promise<void> {
     // TODO: Filter cards that the player shouldn't see
-    const gameState = await GameStateController.getGameStateFromIds(req.params.matchId, req.params.playerId)
+    const gameState = await this.getGameStateFromIds(req.params.matchId, req.params.playerId)
     if (gameState) {
       res.send(gameState);
     } else {
@@ -90,7 +89,7 @@ export class GameStateController implements IControllerBase {
     }
   }
 
-  static async getGameStateFromIds(matchId: string, playerId?: string, playerStatus?: { [playerId: string]: PlayerStatus }): Promise<IGameState | null> {
+  async getGameStateFromIds(matchId: string, playerId?: string, playerStatus?: { [playerId: string]: PlayerStatus }): Promise<IGameState | null> {
     try {
       const gameState = (await GameStateModel.findOne({ _id: matchId }).populate('players'))?.toObject({ versionKey: false }) as IGameState
       if (gameState && playerStatus) {
@@ -104,7 +103,7 @@ export class GameStateController implements IControllerBase {
         }
       }
       if (gameState && playerId) {
-        return GameStateController.filterGameStateForPlayer(gameState, playerId);
+        return this.filterGameStateForPlayer(gameState, playerId);
       }
       return gameState;
     } catch (e: unknown) {
@@ -113,14 +112,14 @@ export class GameStateController implements IControllerBase {
     }
   }
 
-  public getMatch(matchId: string): Match {
+  getMatch(matchId: string): Match {
     if (!this.wsMatchGroups[matchId]) {
       this.wsMatchGroups[matchId] = new Match(matchId);
     }
     return this.wsMatchGroups[matchId];
   }
 
-  public static filterGameStateForPlayer(gameState: IGameState, playerId: string): any {
+  filterGameStateForPlayer(gameState: IGameState, playerId: string): any {
 
     const filteredGameState = {
       ...gameState,
@@ -138,3 +137,5 @@ export class GameStateController implements IControllerBase {
     return filteredGameState;
   }
 }
+
+export const gameStateController = new GameStateController()

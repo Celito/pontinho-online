@@ -1,6 +1,6 @@
 import * as WebSocket from 'ws';
 import { IGameState } from './game-state';
-import { GameStateController } from '../controller/game-state-controller';
+import { gameStateController } from '../controller/game-state-controller';
 import { PlayerStatus } from './player';
 
 export interface Message {
@@ -35,7 +35,7 @@ export class Match {
   public broadcast(message: Message): void {
     console.log(`broadcasting to ${Object.keys(this._playerSockets).length} players`)
     for (const playerId in this._playerSockets) {
-      message.state = GameStateController.filterGameStateForPlayer(message.state, playerId)
+      message.state = gameStateController.filterGameStateForPlayer(message.state, playerId)
       this._playerSockets[playerId].send(JSON.stringify(message), (r) => {
         console.log(`message sent to ${playerId}: `, r)
       });
