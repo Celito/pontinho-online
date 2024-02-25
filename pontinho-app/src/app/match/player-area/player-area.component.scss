@@ -1,0 +1,81 @@
+
+  
+  .player-area {
+    display: flex;
+    flex-direction: column;
+    
+    .player-hand {
+      display: flex;
+      justify-content: center;
+      width: 32.5vw;
+      padding: 1vw 8.5vw 1vw 1vw;
+      border: solid 6px #DDDDDD99;
+      border-radius: 20px;
+      left: calc(28.5vw - 6px);
+    }
+
+    .player-name {
+      text-wrap: nowrap;
+      padding-left: 20px;
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      padding: 0px 10px;
+    }
+  }
+
+.player-area.top {
+  .player-hand {
+    width: 180px;
+  }
+}
+
+.player-area.left, 
+.player-area.right {
+
+  .player-hand {
+    padding: 1vw 1vw 1vw 1vw;
+    height: 180px;
+    width: 0px;
+  }
+
+  .player-name {
+    width: fit-content;   
+    width: 0;
+    height: 20px;
+    flex-direction: row-reverse;
+  }
+}
+
+.player-area.left {
+  flex-direction: row;
+
+  .player-name {
+    -webkit-transform: rotate(90deg); /* Safari and Chrome */
+    -moz-transform: rotate(90deg);   /* Firefox */
+    -ms-transform: rotate(90deg);   /* IE 9 */
+    -o-transform: rotate(90deg);   /* Opera */
+    transform: rotate(90deg);
+  }
+} 
+
+.player-area.right {
+  flex-direction: row-reverse;
+
+  .player-name {
+    margin-top: auto;
+    -webkit-transform: rotate(270deg); /* Safari and Chrome */
+    -moz-transform: rotate(270deg);   /* Firefox */
+    -ms-transform: rotate(270deg);   /* IE 9 */
+    -o-transform: rotate(270deg);   /* Opera */
+    transform: rotate(270deg);
+  }
+}
+
+.player-area.bottom {
+  flex-direction: column-reverse;
+
+  .player-name {
+    flex-direction: row-reverse;
+  }
+}

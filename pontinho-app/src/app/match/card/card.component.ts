@@ -3,7 +3,7 @@ import { trigger, state, transition, animate, style } from '@angular/animations'
 import { Card } from 'src/app/interfaces/Card';
 
 @Component({
-  selector: '[appCard]',
+  selector: 'card',
   templateUrl: './card.component.html',
   styleUrls: ['./card.component.scss'],
   animations: [

@@ -4,8 +4,7 @@ import { Card } from 'src/app/interfaces/Card';
 import { MatchService } from 'src/app/services/match/match.service';
 import { GameState } from 'src/app/interfaces/GameState';
 import { TweenLite } from 'gsap';
-import { Observable, of } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { PlayerState } from 'src/app/interfaces/PlayerState';
 
 const playersDistributionConfig = [
   [0, 1, 0], [1, 0, 1], [1, 1, 1], [1, 2, 1], [2, 1, 2], [2, 2, 2], [2, 3, 2], [3, 2, 3], [3, 3, 3]
@@ -26,12 +25,13 @@ export class TableComponent implements OnInit {
   draggedCardNumber: number = 0;
   draggedCard: Card;
 
-  playersOnTheRight = []
-  playersOnTheTop = []
-  playersOnTheLeft = []
+  playersOnTheRight: PlayerState[] = []
+  playersOnTheTop: PlayerState[] = []
+  playersOnTheLeft: PlayerState[] = []
 
-  @ViewChild('playerHand') playeHand: CdkDropList;
+  playerHand: CdkDropList;
   @ViewChild('mainPile') mainPile: CdkDropList;
+  @ViewChild('discardPile') discardPile: CdkDropList;
 
   constructor(
     private matchService: MatchService
@@ -48,12 +48,8 @@ export class TableComponent implements OnInit {
     );
   }
 
-  getPlayerStatus(playerId?: string): Observable<string> {
-    const statusObs = this.matchService.playersStatus$[playerId || this.matchService.userId]
-    if (statusObs) {
-      return statusObs.pipe(map(status => status === 'Online' ? ' C ' : ' D '))
-    }
-    return of(' U ')
+  setPlayerHand(playerHand: CdkDropList) {
+    this.playerHand = playerHand
   }
 
   drawFromMainPile(_event: CdkDragStart, _drawnCard: Card) {
@@ -71,7 +67,7 @@ export class TableComponent implements OnInit {
 
     const pileElement = this.mainPile.element.nativeElement;
     const topCardElement = pileElement.children[pileElement.childElementCount - 1];
-    const handElement = this.playeHand.element.nativeElement.children[0];
+    const handElement = this.playerHand.element.nativeElement.children[0];
     const lastHandCard = handElement.children[handElement.childElementCount - 1];
     const topCardBounds = topCardElement.getBoundingClientRect();
     const lastHandCardBounds = lastHandCard.getBoundingClientRect();
@@ -83,11 +79,11 @@ export class TableComponent implements OnInit {
     setTimeout(() => {
       event.previousIndex = (event.previousContainer.data.length - 1) - event.previousIndex;
 
-      transferArrayItem(event.previousContainer.data, this.playeHand.data, event.previousIndex,
-        this.playeHand.data.length);
+      transferArrayItem(event.previousContainer.data, this.playerHand.data, event.previousIndex,
+        this.playerHand.data.length);
 
       setTimeout(() => {
-        this.playeHand.data[this.playeHand.data.length - 1].id = this.draggedCardNumber;
+        this.playerHand.data[this.playerHand.data.length - 1].id = this.draggedCardNumber;
         this.draggedCardNumber = 0;
       }, 100);
 

@@ -1,0 +1,23 @@
+<div class="player-area {{position}}">
+  <div class="player-name">
+    <span>{{ player.name }}</span>
+    <span>{{ (getPlayerStatus(player._id) | async) }}</span>
+  </div>
+  <div
+    cdkDropList
+    class="player-hand"
+    id="playerHand"
+    cdkDropListOrientation="horizontal"
+    #playerHand="cdkDropList"
+    [cdkDropListData]="playerCards"
+    [cdkDropListConnectedTo]="[]"
+  >
+    <card
+      class="card"
+      *ngFor="let card of playerCards"
+      cdkDrag
+      [data]="card"
+      [flip]="card.id ? 'up' : 'down'"
+    />
+  </div>
+</div>
