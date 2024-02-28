@@ -1,8 +1,8 @@
 import { CdkDropList } from '@angular/cdk/drag-drop';
-import { Component, EventEmitter, Input, Output, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { PlayerState } from 'src/app/interfaces/PlayerState';
+import { PlayerState, PlayerStatus } from 'src/app/interfaces/PlayerState';
 import { MatchService } from 'src/app/services/match/match.service';
 
 type PlayerAreaPosition = 'top' | 'bottom' | 'right' | 'left'
@@ -12,7 +12,7 @@ type PlayerAreaPosition = 'top' | 'bottom' | 'right' | 'left'
   templateUrl: './player-area.component.html',
   styleUrl: './player-area.component.scss'
 })
-export class PlayerAreaComponent {
+export class PlayerAreaComponent implements OnInit {
   @Input() position: PlayerAreaPosition;
   @Input() player: PlayerState;
 
@@ -22,15 +22,20 @@ export class PlayerAreaComponent {
 
   playerCards = [];
 
+  status$ = new Observable<PlayerStatus>()
+
   constructor(
     private matchService: MatchService
   ) { }
 
-  getPlayerStatus(playerId?: string): Observable<string> {
-    const statusObs = this.matchService.playersStatus$[playerId || this.matchService.userId]
-    if (statusObs) {
-      return statusObs.pipe(map(status => status === 'Online' ? 'C' : 'D'))
+  ngOnInit() {
+    this.status$ = this.matchService.playersStatus$[this.player._id || this.matchService.userId]
+  }
+
+  getPlayerStatus(): Observable<string> {
+    if (this.status$) {
+      return this.status$.pipe(map(status => status === 'Online' ? 'circle' : 'motion_photos_off_outline'))
     }
-    return of('U')
+    return of('help')
   }
 }

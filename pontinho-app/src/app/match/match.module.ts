@@ -5,6 +5,7 @@ import { MatchRoutingModule } from './match-routing.module';
 import { CardComponent } from './card/card.component';
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import { PlayerAreaComponent } from './player-area/player-area.component';
+import { MatIconModule } from '@angular/material/icon';
 
 @NgModule({
   declarations: [
@@ -15,6 +16,7 @@ import { PlayerAreaComponent } from './player-area/player-area.component';
   imports: [
     CommonModule,
     DragDropModule,
+    MatIconModule,
     MatchRoutingModule
   ]
 })

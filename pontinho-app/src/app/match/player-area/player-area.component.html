@@ -1,7 +1,11 @@
 <div class="player-area {{position}}">
   <div class="player-name">
     <span>{{ player.name }}</span>
-    <span>{{ (getPlayerStatus(player._id) | async) }}</span>
+    <mat-icon
+      aria-hidden="false"
+      class="{{ status$ | async }}"
+      [fontIcon]="getPlayerStatus() | async"
+    />
   </div>
   <div
     cdkDropList
