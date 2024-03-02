@@ -1,7 +1,7 @@
-import WebSocket = require("ws");
-import { JoinMessage } from "../messages/join-message";
+import * as WebSocket from "ws";
 import { MessageOptions } from "./match-server";
 import { gameStateController } from "./game-state-controller";
+import { JoinMessage } from "shared-types/messages";
 
 export const resolveJoin = async (ws: WebSocket, message: JoinMessage, options?: MessageOptions) => {
   const { server } = options!

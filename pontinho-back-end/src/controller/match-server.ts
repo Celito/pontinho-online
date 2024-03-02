@@ -1,8 +1,8 @@
 import * as WebSocket from 'ws';
 import { Server as HTTPServer } from 'http';
-import { MessageResolver } from '../messages/message';
 import { resolveJoin } from './join-resolver';
 import { resolveLeave } from './leave-resolver';
+import { MessageResolver } from 'shared-types/messages'
 
 export type MessageOptions = {
   server: MatchServer
