@@ -44,7 +44,7 @@ export class MatchService {
   private connectWS(matchId: string, playerId: string): void {
     console.log(`starting connection to websocket with matchId: "${matchId}" and playerId: "${playerId}"`)
     this._matchSocket = new WebSocket('ws://localhost:3000');
-    this._matchSocket.addEventListener('message', ev => this.receiveMatchMessage(ev));
+    this._matchSocket.addEventListener('message', ev => this.onReceiveMatchMessage(ev));
     this._matchSocket.addEventListener('open', ev => {
       console.log('socket connection opened', ev, this._matchSocket.readyState)
       this._matchSocket.send(
@@ -57,9 +57,7 @@ export class MatchService {
         })
       );
     });
-    this._matchSocket.addEventListener('close', ev => {
-      console.log('socket connection closed', ev)
-    });
+    this._matchSocket.addEventListener('close', ev => this.onMatchSocketClosed(ev));
     this._matchSocket.addEventListener('error', ev => {
       console.log('socket connection errored', ev)
     });
@@ -101,6 +99,12 @@ export class MatchService {
     this._gameStateSub.next(this._gameState);
   }
 
+  setAllPlayerStatus(status: PlayerStatus) {
+    for (const state in this._playersStatusSubs) {
+      this._playersStatusSubs[state].next(status);
+    }
+  }
+
   fetchGameState(): Observable<GameState> {
     const matchId = sessionStorage.getItem(MatchService.MATCH_ID_TOKEN);
     const playerId = sessionStorage.getItem(MatchService.PLAYER_ID_TOKEN);
@@ -121,12 +125,18 @@ export class MatchService {
     );
   }
 
-  receiveMatchMessage(event: MessageEvent): any {
+  onReceiveMatchMessage(event: MessageEvent): any {
     const data: Message = JSON.parse(event.data);
     this.setGameState(data.state);
     if (data.type === 'joined' && data.params.player_id !== this.userId) {
       this.toastr.info(`${this.getPlayer(data.params.player_id)?.name} has joined the game`);
     }
+  }
+
+  onMatchSocketClosed(event: CloseEvent) {
+    console.log('socket connection closed', event);
+    this.setAllPlayerStatus('Offline');
+    this.toastr.error(`Lost connection with the server`);
   }
 
   getPlayer(player_id: string): PlayerState {
