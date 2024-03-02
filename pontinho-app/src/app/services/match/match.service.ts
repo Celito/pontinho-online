@@ -36,8 +36,6 @@ export class MatchService {
   ) {
     const matchId = sessionStorage.getItem(MatchService.MATCH_ID_TOKEN);
     const playerId = sessionStorage.getItem(MatchService.PLAYER_ID_TOKEN);
-
-    console.log(`match service constructor, matchId: "${matchId}" and playerId: "${playerId}"`)
     if (matchId && playerId) {
       this.connectWS(matchId, playerId)
     }
@@ -65,7 +63,6 @@ export class MatchService {
     this._matchSocket.addEventListener('error', ev => {
       console.log('socket connection errored', ev)
     });
-    console.log('all match socket events subscribed')
   }
 
   setGameState(gameState: GameState, newUserName?: string): void {
@@ -101,7 +98,6 @@ export class MatchService {
       this.userName = gameState.players.find(p => p._id === sessionPlayerId)?.name;
       this.userId = sessionPlayerId;
     }
-    console.log('about to call next', this._gameState)
     this._gameStateSub.next(this._gameState);
   }
 
@@ -112,7 +108,6 @@ export class MatchService {
       `/api/match/${matchId}/${playerId}`
     ).pipe(
       map((retreivedGameState: GameState) => {
-        console.log('received game state');
         return retreivedGameState;
       }),
       catchError((error: HttpErrorResponse) => {
@@ -128,9 +123,8 @@ export class MatchService {
 
   receiveMatchMessage(event: MessageEvent): any {
     const data: Message = JSON.parse(event.data);
-    console.log('Received message through the socket: ', event);
-    this.setGameState(data.state)
-    if (data.type === 'joined') {
+    this.setGameState(data.state);
+    if (data.type === 'joined' && data.params.player_id !== this.userId) {
       this.toastr.info(`${this.getPlayer(data.params.player_id)?.name} has joined the game`);
     }
   }

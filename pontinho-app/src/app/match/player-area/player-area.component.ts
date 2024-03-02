@@ -29,6 +29,7 @@ export class PlayerAreaComponent implements OnInit {
   ) { }
 
   ngOnInit() {
+    console.log('creating player area with id', this.player._id || this.matchService.userId)
     this.status$ = this.matchService.playersStatus$[this.player._id || this.matchService.userId]
   }
 

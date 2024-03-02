@@ -65,8 +65,9 @@
   </div>
   <div class="bottom-area">
     <player-area
+      *ngIf="userPlayer"
       position="bottom"
-      [player]="{ name: playerName }"
+      [player]="userPlayer"
     />
   </div>
 </div>

@@ -18,10 +18,9 @@ const playersDistributionConfig = [
 export class TableComponent implements OnInit {
 
   gameState: GameState;
-  playerCards = [];
+  userPlayer: PlayerState;
   pile: Card[] = [];
   discard = [];
-  playerName: string;
   draggedCardNumber: number = 0;
   draggedCard: Card;
 
@@ -40,7 +39,6 @@ export class TableComponent implements OnInit {
   ngOnInit() {
     this.matchService.gameState$.subscribe(
       gs => {
-        console.log('game state received in the table', gs)
         if (gs) {
           this.updateGameState(gs);
         }
@@ -92,7 +90,7 @@ export class TableComponent implements OnInit {
 
   dropToPlayerHand(event: CdkDragDrop<Card[]>) {
     if (event.previousContainer === event.container) {
-      moveItemInArray(this.playerCards, event.previousIndex, event.currentIndex);
+      moveItemInArray(this.userPlayer?.cards || [], event.previousIndex, event.currentIndex);
     } else {
       if (event.previousContainer.id === 'discardPile' || event.previousContainer.id === 'mainPile') {
         event.previousIndex = (event.previousContainer.data.length - 1) - event.previousIndex;
@@ -120,7 +118,6 @@ export class TableComponent implements OnInit {
   }
 
   updateGameState(gameState: GameState) {
-    this.playerName = this.matchService.userName;
     this.pile = gameState.mainPile.cards;
     this.gameState = gameState;
 
@@ -129,7 +126,7 @@ export class TableComponent implements OnInit {
     for (let index = 0; index < gameState.players.length; index++) {
       const player = gameState.players[index]
       if (player._id === this.matchService.userId) {
-        this.playerCards = player.cards;
+        this.userPlayer = player;
         if (gameState.players.length > 1) {
           otherPlayers.push(...gameState.players.slice(index + 1))
           otherPlayers.push(...gameState.players.slice(0, index))

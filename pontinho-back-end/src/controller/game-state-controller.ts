@@ -119,7 +119,7 @@ class GameStateController implements IControllerBase {
     return this.wsMatchGroups[matchId];
   }
 
-  filterGameStateForPlayer(gameState: IGameState, playerId: string): any {
+  filterGameStateForPlayer(gameState: IGameState, playerId: string): IGameState {
 
     const filteredGameState = {
       ...gameState,
