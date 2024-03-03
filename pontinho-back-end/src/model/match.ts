@@ -1,20 +1,14 @@
 import * as WebSocket from 'ws';
-import { IGameState } from './game-state';
 import { gameStateController } from '../controller/game-state-controller';
-import { PlayerStatus } from './player';
-
-export interface Message {
-  type: 'joined';
-  params: {
-    player_id?: string;
-  };
-  state: IGameState;
-}
+import { PlayerStatus } from 'shared-types/types';
+import { MessageBase } from 'shared-types/messages/message-base';
 
 export type PlayerStatusMap = { [playerId: string]: PlayerStatus }
 
+type PlayerSocketsMap = { [playerId: string]: WebSocket }
+
 export class Match {
-  private _playerSockets: { [playerId: string]: WebSocket } = {};
+  private _playerSockets: PlayerSocketsMap = {};
 
   get id(): string {
     return this._matchId;
@@ -23,24 +17,21 @@ export class Match {
   get playerStatus(): PlayerStatusMap {
     const status: PlayerStatusMap = {};
     for (const playerId in this._playerSockets) {
-      status[playerId] = this._playerSockets[playerId].readyState === WebSocket.OPEN ? 'Online' : 'Offline'
+      status[playerId] =
+        this._playerSockets[playerId].readyState === WebSocket.OPEN ?
+          'Online' :
+          'Offline';
     }
-    return status
+    return status;
+  }
+
+  get playerSockets(): PlayerSocketsMap {
+    return this._playerSockets;
   }
 
   constructor(
     private _matchId: string
   ) { }
-
-  public broadcast(message: Message): void {
-    console.log(`broadcasting to ${Object.keys(this._playerSockets).length} players`)
-    for (const playerId in this._playerSockets) {
-      message.state = gameStateController.filterGameStateForPlayer(message.state, playerId)
-      this._playerSockets[playerId].send(JSON.stringify(message), (r) => {
-        console.log(`message sent to ${playerId}: `, r)
-      });
-    }
-  }
 
   public addPlayerSocket(playerId: string, socket: WebSocket): boolean {
     const alreadyIn = playerId in this._playerSockets

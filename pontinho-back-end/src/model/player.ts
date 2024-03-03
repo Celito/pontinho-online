@@ -1,17 +1,6 @@
 import * as mongoose from 'mongoose';
 import { Schema } from 'mongoose';
-
-export type PlayerStatus = 'Online' | 'Offline';
-
-export interface IPlayer {
-  _id: string;
-  name: string;
-  cards: number[];
-  yourTurn: boolean;
-  alreadyDraw: boolean;
-  scores: number;
-  status?: PlayerStatus;
-}
+import { Player } from 'shared-types/types'
 
 const PlayerSchema = new Schema(
   {
@@ -23,4 +12,4 @@ const PlayerSchema = new Schema(
   }
 );
 
-export default mongoose.model<IPlayer>('Player', PlayerSchema);
+export default mongoose.model<Player>('Player', PlayerSchema);

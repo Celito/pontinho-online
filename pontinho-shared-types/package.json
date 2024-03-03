@@ -1,9 +1,10 @@
 {
   "name": "shared-types",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Shared types between the back-end and the client for the pontinho project",
-  "main": "index.ts",
+  "main": "dist/index.js",
   "scripts": {
+    "build": "tsc --declaration --emitDeclarationOnly",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
@@ -15,9 +16,11 @@
   "author": "Celito Felipetto",
   "license": "ISC",
   "dependencies": {
+    "tslib": "^2.0.0",
+    "typescript": "^5.3.3",
     "ws": "^8.16.0"
   },
   "devDependencies": {
-    "@types/ws": "^8.5.10"
+    "@types/ws": "^8.5.4"
   }
 }

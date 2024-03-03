@@ -1,8 +1,9 @@
-import PlayerModel, { IPlayer, PlayerStatus } from '../model/player';
-import GameStateModel, { IGameState } from '../model/game-state';
+import PlayerModel from '../model/player';
+import GameStateModel from '../model/game-state';
 import IControllerBase from '../config/controller-base';
 import { Request, Response, Application, Router } from "express";
 import { Match } from '../model/match';
+import { GameState, Player, PlayerStatus } from 'shared-types/types';
 
 class GameStateController implements IControllerBase {
 
@@ -38,7 +39,7 @@ class GameStateController implements IControllerBase {
       return res.status(500).send("Failed to generate the game state");
     }
     res.status(200).send(
-      this.filterGameStateForPlayer(updatedGameState.toObject({ versionKey: false }) as IGameState, newPlayer._id.toString())
+      this.filterGameStateForPlayer(updatedGameState.toObject({ versionKey: false }) as GameState, newPlayer._id.toString())
     );
   }
 
@@ -75,7 +76,7 @@ class GameStateController implements IControllerBase {
       return res.status(500).send("Failed to join the match");
     }
     res.send(
-      this.filterGameStateForPlayer(updatedGameState.toObject({ versionKey: false }) as IGameState, newPlayer._id.toString())
+      this.filterGameStateForPlayer(updatedGameState.toObject({ versionKey: false }) as GameState, newPlayer._id.toString())
     );
   }
 
@@ -89,17 +90,17 @@ class GameStateController implements IControllerBase {
     }
   }
 
-  async getGameStateFromIds(matchId: string, playerId?: string, playerStatus?: { [playerId: string]: PlayerStatus }): Promise<IGameState | null> {
+  async getGameStateFromIds(matchId: string, playerId?: string, playerStatus?: { [playerId: string]: PlayerStatus }): Promise<GameState | null> {
     try {
-      const gameState = (await GameStateModel.findOne({ _id: matchId }).populate('players'))?.toObject({ versionKey: false }) as IGameState
+      const gameState = (await GameStateModel.findOne({ _id: matchId }).populate('players'))?.toObject({ versionKey: false }) as GameState
       if (gameState && playerStatus) {
         for (const playerIndex in gameState.players) {
-          const player: IPlayer = JSON.parse(JSON.stringify(gameState.players[playerIndex]))
+          const player: Player = JSON.parse(JSON.stringify(gameState.players[playerIndex]))
           gameState.players[playerIndex] = {
             ...player,
             status: playerStatus[player._id] || 'Offline'
-          } as IPlayer
-          console.log(`setting player ${player.name} status to ${(gameState.players[playerIndex] as IPlayer).status}`)
+          } as Player
+          console.log(`setting player ${player.name} status to ${(gameState.players[playerIndex] as Player).status}`)
         }
       }
       if (gameState && playerId) {
@@ -119,12 +120,12 @@ class GameStateController implements IControllerBase {
     return this.wsMatchGroups[matchId];
   }
 
-  filterGameStateForPlayer(gameState: IGameState, playerId: string): IGameState {
+  filterGameStateForPlayer(gameState: GameState, playerId: string): GameState {
 
     const filteredGameState = {
       ...gameState,
       players: gameState.players.map(p => {
-        const castP = p as IPlayer;
+        const castP = p as Player;
         return {
           ...castP,
           cards: castP.cards?.map(c => castP._id === playerId ? c : 0) || []

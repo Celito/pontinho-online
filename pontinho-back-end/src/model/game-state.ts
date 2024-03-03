@@ -1,18 +1,6 @@
 import * as mongoose from 'mongoose';
 import { Schema } from 'mongoose';
-import { IPlayer } from './player';
-
-export interface IGameState {
-  _id: string;
-  host: string;
-  players: (IPlayer['_id'] | IPlayer)[];
-  mainPile: {
-    cards: number[];
-  }
-  discard: {
-    cards: number[];
-  }
-}
+import { GameState } from 'shared-types/types';
 
 const cards = Array.from(Array(104), (x, index) => index + 1);
 
@@ -35,4 +23,4 @@ const GameStateSchema = new Schema(
   }
 );
 
-export default mongoose.model<IGameState>('GameState', GameStateSchema);
+export default mongoose.model<GameState>('GameState', GameStateSchema);

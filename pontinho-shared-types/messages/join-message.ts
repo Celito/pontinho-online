@@ -1,4 +1,5 @@
-import { MessageBase, MessageTypes } from "./message";
+import { GameState } from "../types";
+import { MessageBase, MessageTypes } from "./message-base";
 
 type JoinMessageData = {
   playerId: string
@@ -7,6 +8,7 @@ type JoinMessageData = {
 
 export class JoinMessage extends MessageBase {
   type: MessageTypes = 'join';
+  state?: GameState;
 
   constructor(
     public data: JoinMessageData

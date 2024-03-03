@@ -32,6 +32,6 @@ export class MatchServer {
 
   private async onMessage(ws: WebSocket, message: WebSocket.Data): Promise<void> {
     console.log('received:', message);
-    await this.resolver.resolve(ws, message, { server: this });
+    await this.resolver.resolveMessage(ws, message, { server: this });
   }
 }

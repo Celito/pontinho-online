@@ -2,6 +2,7 @@ import * as WebSocket from "ws";
 import { MessageOptions } from "./match-server";
 import { gameStateController } from "./game-state-controller";
 import { JoinMessage } from "shared-types/messages";
+import { Match } from "../model/match";
 
 export const resolveJoin = async (ws: WebSocket, message: JoinMessage, options?: MessageOptions) => {
   const { server } = options!
@@ -23,18 +24,22 @@ export const resolveJoin = async (ws: WebSocket, message: JoinMessage, options?:
   console.log('add player to match restult: ', addResult);
 
   try {
-    const state = await gameStateController.getGameStateFromIds(match.id, undefined, match.playerStatus);
-    console.log('state for the broadcast: ', JSON.stringify(state))
-    if (state) {
-      match.broadcast(
-        {
-          type: 'joined',
-          params: { player_id: playerId },
-          state
-        }
-      );
-    }
+    await broadcast(match, message);
   } catch (e) {
     console.log('Error while trying join a match', e)
+  }
+}
+
+const broadcast = async (match: Match, message: JoinMessage) => {
+  const playerSockets = match.playerSockets
+  console.log(`broadcasting to ${Object.keys(playerSockets).length} players`)
+  const state = await gameStateController.getGameStateFromIds(match.id, undefined, match.playerStatus)
+  if (state) {
+    for (const playerId in playerSockets) {
+      message.state = gameStateController.filterGameStateForPlayer(state, playerId)
+      playerSockets[playerId].send(JSON.stringify(message), (r) => {
+        console.log(`message sent to ${playerId}: `, r)
+      });
+    }
   }
 }

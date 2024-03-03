@@ -7,6 +7,7 @@ import { catchError, map } from 'rxjs/operators';
 import { Message } from 'src/app/interfaces/Message';
 import { ToastrService } from 'ngx-toastr';
 import { PlayerState, PlayerStatus } from 'src/app/interfaces/PlayerState';
+import { JoinMessage, LeaveMessage, MessageResolver } from 'shared-types/messages'
 
 
 @Injectable({
@@ -19,6 +20,7 @@ export class MatchService {
 
   private _gameState: GameState;
   private _matchSocket: WebSocket;
+  private _resolver: MessageResolver;
 
   private _gameStateSub: BehaviorSubject<GameState> = new BehaviorSubject(undefined);
   private _playersStatusSubs: { [playerId: string]: BehaviorSubject<PlayerStatus> } = {}
@@ -39,6 +41,10 @@ export class MatchService {
     if (matchId && playerId) {
       this.connectWS(matchId, playerId)
     }
+    this._resolver = new MessageResolver({
+      join: async (ws: any, message: JoinMessage) => { console.log('resolver.join', message) },
+      leave: async (ws: any, message: LeaveMessage) => { }
+    });
   }
 
   private connectWS(matchId: string, playerId: string): void {
@@ -126,7 +132,8 @@ export class MatchService {
   }
 
   onReceiveMatchMessage(event: MessageEvent): any {
-    const data: Message = JSON.parse(event.data);
+    this._resolver.resolveMessage(undefined, event.data)
+    const data: Message = JSON.parse(event.data.toString());
     this.setGameState(data.state);
     if (data.type === 'joined' && data.params.player_id !== this.userId) {
       this.toastr.info(`${this.getPlayer(data.params.player_id)?.name} has joined the game`);

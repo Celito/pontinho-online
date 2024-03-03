@@ -1,4 +1,4 @@
-import { MessageBase, MessageTypes } from "./message";
+import { MessageBase, MessageTypes } from "./message-base";
 
 type LeaveMessageData = {
   playerId: string
