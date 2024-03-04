@@ -2,7 +2,7 @@ import { CdkDropList } from '@angular/cdk/drag-drop';
 import { Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { PlayerState, PlayerStatus } from 'src/app/interfaces/PlayerState';
+import { Player, PlayerStatus } from 'shared-types/types';
 import { MatchService } from 'src/app/services/match/match.service';
 
 type PlayerAreaPosition = 'top' | 'bottom' | 'right' | 'left'
@@ -14,7 +14,7 @@ type PlayerAreaPosition = 'top' | 'bottom' | 'right' | 'left'
 })
 export class PlayerAreaComponent implements OnInit {
   @Input() position: PlayerAreaPosition;
-  @Input() player: PlayerState;
+  @Input() player: Player;
 
   @Output() playerHand: EventEmitter<CdkDropList> = new EventEmitter<CdkDropList>();
 

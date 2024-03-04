@@ -1,6 +1,6 @@
 import * as mongoose from 'mongoose';
 import { Schema } from 'mongoose';
-import { GameState } from 'shared-types/types';
+import { GameState, Player } from 'shared-types/types';
 
 const cards = Array.from(Array(104), (x, index) => index + 1);
 
@@ -23,4 +23,6 @@ const GameStateSchema = new Schema(
   }
 );
 
-export default mongoose.model<GameState>('GameState', GameStateSchema);
+type GameStateModel = GameState & { player: string | Player }
+
+export default mongoose.model<GameStateModel>('GameState', GameStateSchema);

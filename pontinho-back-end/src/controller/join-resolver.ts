@@ -1,10 +1,10 @@
 import * as WebSocket from "ws";
-import { MessageOptions } from "./match-server";
+import { ResolverOptions } from "./match-server";
 import { gameStateController } from "./game-state-controller";
 import { JoinMessage } from "shared-types/messages";
 import { Match } from "../model/match";
 
-export const resolveJoin = async (ws: WebSocket, message: JoinMessage, options?: MessageOptions) => {
+export const resolveJoin = async (ws: WebSocket, message: JoinMessage, options?: ResolverOptions) => {
   const { server } = options!
   console.log('resolving a join message', message);
   // testing, we can keep the match state on the server object and not have to load it from the
@@ -36,7 +36,7 @@ const broadcast = async (match: Match, message: JoinMessage) => {
   const state = await gameStateController.getGameStateFromIds(match.id, undefined, match.playerStatus)
   if (state) {
     for (const playerId in playerSockets) {
-      message.state = gameStateController.filterGameStateForPlayer(state, playerId)
+      message.data.state = gameStateController.filterGameStateForPlayer(state, playerId)
       playerSockets[playerId].send(JSON.stringify(message), (r) => {
         console.log(`message sent to ${playerId}: `, r)
       });

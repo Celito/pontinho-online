@@ -3,7 +3,7 @@ import { Player } from "./player";
 export type GameState = {
   _id: string;
   host: string;
-  players: (Player['_id'] | Player)[];
+  players: Player[];
   mainPile: {
     cards: number[];
   }

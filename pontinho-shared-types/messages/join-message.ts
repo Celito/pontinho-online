@@ -4,11 +4,11 @@ import { MessageBase, MessageTypes } from "./message-base";
 type JoinMessageData = {
   playerId: string
   matchId: string
+  state?: GameState;
 }
 
 export class JoinMessage extends MessageBase {
   type: MessageTypes = 'join';
-  state?: GameState;
 
   constructor(
     public data: JoinMessageData

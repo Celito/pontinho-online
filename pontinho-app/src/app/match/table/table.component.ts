@@ -2,9 +2,8 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { CdkDragDrop, moveItemInArray, transferArrayItem, CdkDragStart, CdkDropList } from '@angular/cdk/drag-drop';
 import { Card } from 'src/app/interfaces/Card';
 import { MatchService } from 'src/app/services/match/match.service';
-import { GameState } from 'src/app/interfaces/GameState';
 import { TweenLite } from 'gsap';
-import { PlayerState } from 'src/app/interfaces/PlayerState';
+import { GameState, Player } from 'shared-types/types';
 
 const playersDistributionConfig = [
   [0, 1, 0], [1, 0, 1], [1, 1, 1], [1, 2, 1], [2, 1, 2], [2, 2, 2], [2, 3, 2], [3, 2, 3], [3, 3, 3]
@@ -18,15 +17,15 @@ const playersDistributionConfig = [
 export class TableComponent implements OnInit {
 
   gameState: GameState;
-  userPlayer: PlayerState;
+  userPlayer: Player;
   pile: Card[] = [];
   discard = [];
   draggedCardNumber: number = 0;
   draggedCard: Card;
 
-  playersOnTheRight: PlayerState[] = []
-  playersOnTheTop: PlayerState[] = []
-  playersOnTheLeft: PlayerState[] = []
+  playersOnTheRight: Player[] = []
+  playersOnTheTop: Player[] = []
+  playersOnTheLeft: Player[] = []
 
   playerHand: CdkDropList;
   @ViewChild('mainPile') mainPile: CdkDropList;
@@ -118,7 +117,7 @@ export class TableComponent implements OnInit {
   }
 
   updateGameState(gameState: GameState) {
-    this.pile = gameState.mainPile.cards;
+    this.pile = gameState.mainPile.cards.map(c => ({ id: c }));
     this.gameState = gameState;
 
     const otherPlayers = []

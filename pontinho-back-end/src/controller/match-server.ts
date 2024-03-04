@@ -4,13 +4,13 @@ import { resolveJoin } from './join-resolver';
 import { resolveLeave } from './leave-resolver';
 import { MessageResolver } from 'shared-types/messages'
 
-export type MessageOptions = {
+export type ResolverOptions = {
   server: MatchServer
 }
 
 export class MatchServer {
   private readonly wss: WebSocket.Server;
-  private readonly resolver: MessageResolver<MessageOptions> = new MessageResolver({
+  private readonly resolver: MessageResolver<WebSocket, ResolverOptions> = new MessageResolver({
     join: resolveJoin,
     leave: resolveLeave
   });

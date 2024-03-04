@@ -1,14 +1,17 @@
 import { Injectable } from '@angular/core';
-import { GameState } from '../../interfaces/GameState';
 import { Card } from '../../interfaces/Card';
 import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { catchError, map } from 'rxjs/operators';
-import { Message } from 'src/app/interfaces/Message';
 import { ToastrService } from 'ngx-toastr';
-import { PlayerState, PlayerStatus } from 'src/app/interfaces/PlayerState';
-import { JoinMessage, LeaveMessage, MessageResolver } from 'shared-types/messages'
+import { LeaveMessage, MessageResolver } from 'shared-types/messages'
+import { joinResolver } from './resolvers/join-resolver';
+import { GameState, Player, PlayerStatus } from 'shared-types/types';
 
+export type ResolverOptions = {
+  matchService: MatchService
+  toastr: ToastrService
+}
 
 @Injectable({
   providedIn: 'root'
@@ -20,7 +23,7 @@ export class MatchService {
 
   private _gameState: GameState;
   private _matchSocket: WebSocket;
-  private _resolver: MessageResolver;
+  private _resolver: MessageResolver<WebSocket, ResolverOptions>;
 
   private _gameStateSub: BehaviorSubject<GameState> = new BehaviorSubject(undefined);
   private _playersStatusSubs: { [playerId: string]: BehaviorSubject<PlayerStatus> } = {}
@@ -41,9 +44,9 @@ export class MatchService {
     if (matchId && playerId) {
       this.connectWS(matchId, playerId)
     }
-    this._resolver = new MessageResolver({
-      join: async (ws: any, message: JoinMessage) => { console.log('resolver.join', message) },
-      leave: async (ws: any, message: LeaveMessage) => { }
+    this._resolver = new MessageResolver<WebSocket, ResolverOptions>({
+      join: joinResolver,
+      leave: async (ws: WebSocket, message: LeaveMessage) => { }
     });
   }
 
@@ -78,15 +81,15 @@ export class MatchService {
 
     for (const player of gameState.players) {
       if (!this._playersStatusSubs[player._id]) {
-        this._playersStatusSubs[player._id] = new BehaviorSubject(player.status)
-        this.playersStatus$[player._id] = this._playersStatusSubs[player._id].asObservable()
+        this._playersStatusSubs[player._id] = new BehaviorSubject(player.status);
+        this.playersStatus$[player._id] = this._playersStatusSubs[player._id].asObservable();
       } else {
-        this._playersStatusSubs[player._id].next(player.status)
+        this._playersStatusSubs[player._id].next(player.status);
       }
     }
 
     if (newUserName) {
-      const player = gameState.players.find(p => p.name === newUserName);
+      const player: Player | undefined = gameState.players.find(p => (p as Player).name === newUserName);
       if (player) {
         this.userId = player._id;
         sessionStorage.setItem(
@@ -99,7 +102,8 @@ export class MatchService {
         }
       }
     } else if (!this.userName && sessionPlayerId) {
-      this.userName = gameState.players.find(p => p._id === sessionPlayerId)?.name;
+      this.userName =
+        (gameState.players.find(p => (p as Player)._id === sessionPlayerId) as Player)?.name;
       this.userId = sessionPlayerId;
     }
     this._gameStateSub.next(this._gameState);
@@ -132,12 +136,11 @@ export class MatchService {
   }
 
   onReceiveMatchMessage(event: MessageEvent): any {
-    this._resolver.resolveMessage(undefined, event.data)
-    const data: Message = JSON.parse(event.data.toString());
-    this.setGameState(data.state);
-    if (data.type === 'joined' && data.params.player_id !== this.userId) {
-      this.toastr.info(`${this.getPlayer(data.params.player_id)?.name} has joined the game`);
-    }
+    this._resolver.resolveMessage(
+      this._matchSocket,
+      event.data,
+      { matchService: this, toastr: this.toastr }
+    );
   }
 
   onMatchSocketClosed(event: CloseEvent) {
@@ -146,7 +149,7 @@ export class MatchService {
     this.toastr.error(`Lost connection with the server`);
   }
 
-  getPlayer(player_id: string): PlayerState {
+  getPlayer(player_id: string): Player {
     return this._gameState.players.find(p => p._id === player_id);
   }
 

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http'
-import { GameState } from '../../interfaces/GameState';
 import { Observable, of } from 'rxjs';
+import { GameState } from 'shared-types/types';
 
 @Injectable({
   providedIn: 'root'
